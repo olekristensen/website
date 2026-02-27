@@ -4,13 +4,13 @@
  * Design System: "Gallery Neon"
  * Aesthetic: White room gallery meets digital edge — editorial restraint
  *            with surgical neon green accents that signal technical craft.
- * Fonts: Instrument Serif (display) + Instrument Sans (body)
- * Palette: Near-black on white, warm-gray system, neon green (#39FF14) accent
+ * Fonts: Space Grotesk (display) + Instrument Sans (body)
+ * Palette: Near-black on white, warm-gray system, neon green accent
  */
 
 @theme {
   /* --- Typography --- */
-  --font-display: 'Instrument Serif', 'Georgia', serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
   --font-body: 'Instrument Sans', 'Helvetica Neue', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
 
@@ -70,17 +70,17 @@
     letter-spacing: -0.01em;
   }
 
-  /* Editorial type scale */
+  /* Display type scale — geometric, contemporary */
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.025em;
-    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
   }
 
-  h1 { font-size: clamp(2.5rem, 6vw, 5rem); }
-  h2 { font-size: clamp(1.75rem, 3.5vw, 3rem); }
-  h3 { font-size: clamp(1.25rem, 2vw, 1.75rem); }
+  h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+  h2 { font-size: clamp(1.75rem, 3.5vw, 2.75rem); }
+  h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 500; }
 
   a {
     color: inherit;

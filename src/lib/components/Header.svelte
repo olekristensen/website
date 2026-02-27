@@ -4,9 +4,9 @@
 
 <nav class="fixed top-0 z-50 w-full mix-blend-difference">
 	<div class="content-width flex items-center justify-between py-5">
-		<a href="/" class="flex items-center gap-2 font-display text-lg tracking-tight text-white">
+		<a href="/" class="flex items-center gap-2 font-display text-lg font-600 tracking-tight text-white">
 			<span class="neon-dot"></span>
-			ole kristensen
+			Ole Kristensen
 		</a>
 
 		<!-- Desktop nav -->
@@ -37,9 +37,9 @@
 	role="dialog"
 	aria-modal="true"
 >
-	<a href="/works" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">Works</a>
-	<a href="/consultancies" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">Consultancies</a>
-	<a href="/about" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">About</a>
-	<a href="/contact" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">Contact</a>
+	<a href="/works" onclick={() => menuOpen = false} class="font-display text-3xl font-600 text-white/80 transition-colors hover:text-[var(--color-neon)]">Works</a>
+	<a href="/consultancies" onclick={() => menuOpen = false} class="font-display text-3xl font-600 text-white/80 transition-colors hover:text-[var(--color-neon)]">Consultancies</a>
+	<a href="/about" onclick={() => menuOpen = false} class="font-display text-3xl font-600 text-white/80 transition-colors hover:text-[var(--color-neon)]">About</a>
+	<a href="/contact" onclick={() => menuOpen = false} class="font-display text-3xl font-600 text-white/80 transition-colors hover:text-[var(--color-neon)]">Contact</a>
 </div>
 {/if}

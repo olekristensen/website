@@ -1,31 +1,77 @@
-You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
+# Den Frie Vilje — Project Guidelines
 
-## Available MCP Tools:
+Portfolio/artwork website for Ole Kristensen. Static SvelteKit site with filesystem-based markdown content.
 
-### 1. list-sections
+## Build & Test
 
-Use this FIRST to discover all available documentation sections. Returns a structured list with titles, use_cases, and paths.
-When asked about Svelte or SvelteKit topics, ALWAYS use this tool at the start of the chat to find relevant sections.
+All commands require `pkgx` prefix (it manages pnpm/Node):
 
-### 2. get-documentation
+```sh
+pkgx pnpm install          # install deps
+pkgx pnpm dev              # dev server (runs image processing first)
+pkgx pnpm build            # static build → build/
+pkgx pnpm check            # svelte-check + tsc
+pkgx pnpm lint             # eslint + prettier check
+pkgx pnpm format           # auto-format
+pkgx pnpm test             # vitest (E2E smoke tests against dev server)
+```
 
-Retrieves full documentation content for specific sections. Accepts single or multiple sections.
-After calling the list-sections tool, you MUST analyze the returned documentation sections (especially the use_cases field) and then use the get-documentation tool to fetch ALL documentation sections that are relevant for the user's task.
+Image processing (`scripts/process-images.js`) runs automatically before `dev` and `build` — it copies images from `src/content/` to `static/content/` and generates 480px thumbnails.
 
-### 3. svelte-autofixer
+## Architecture
 
-Analyzes Svelte code and returns issues and suggestions.
-You MUST use this tool whenever writing Svelte code before sending it to the user. Keep calling it until no issues or suggestions are returned.
+- **Svelte 5** with runes (`$props()`, `$state()`, `$derived()`) — no legacy `export let` or `$:`
+- **SvelteKit 2** with `adapter-static` — entire site is prerendered, `+layout.ts` sets `prerender = true`
+- **Tailwind CSS v4** — `@tailwindcss/vite` plugin, theme tokens in `@theme` block in `src/app.css`
+- **Content loading** is server-only (`fs`/`path` in `+page.server.ts` via `src/lib/content.ts`)
+- **Markdown** parsed with `marked`, frontmatter with `js-yaml`, rendered via `{@html}`
 
-### 4. playground-link
+### Content System
 
-Generates a Svelte Playground link with the provided code.
-After completing the code, ask the user if they want a playground link. Only call this tool after user confirmation and NEVER if code was written to files in their project.
+Content lives in `src/content/{section}/{N.slug}/index.md`:
+- Sections: `works/`, `consultancies/`, `about/`, `contact/`
+- Numeric prefix controls sort order (e.g. `17.oresund`) — stripped to derive URL slug
+- Images co-located alongside `index.md`, processed to `static/content/` at build time
+- Frontmatter fields: `title`, `date`, `lead`, `tags[]`, `materials`, `partners`, `client`, `github`, `photocredits`, `appearances[]`, `videos[]`
 
-## Additional skills
+See [docs/content-structure.md](docs/content-structure.md) for full details.
 
-See other skills in /Users/drexolek/.gemini/antigravity/skills and use them if mentioned with @ sign
+### Key Files
 
-## memory
+| Path | Purpose |
+|------|---------|
+| `src/lib/content.ts` | Content API: `getContentList()`, `getContent()`, frontmatter parsing |
+| `src/app.css` | Tailwind `@theme` tokens, design system utilities |
+| `src/lib/components/` | Header, Footer, Hero, VimeoPlayer |
+| `scripts/process-images.js` | Image copy + thumbnail generation |
 
-Keep a memory of design and architectural decisions in ./docs
+### Route Pattern
+
+Collection pages (`works/`, `consultancies/`): `+page.server.ts` calls `getContentList()` → groups by year → grid layout.
+Detail pages (`[slug]/`): `+page.server.ts` calls `getContent()` → detail layout with videos, gallery lightbox, prose.
+Single pages (`about/`, `contact/`): `+page.server.ts` calls `getContent()` → prose layout.
+
+## Code Style
+
+- TypeScript everywhere — `.ts` config files, `lang="ts"` in Svelte components
+- Tailwind utility classes inline in markup — no scoped `<style>` except for prose `:global()` selectors
+- Svelte 5 snippets for slot rendering: `{@render children()}`
+- Design tokens via CSS custom properties: `var(--color-ink)`, `var(--color-neon)`, etc.
+
+See [docs/agent-knowledge.md](docs/agent-knowledge.md) for the full design system ("Gallery Neon") reference.
+
+## Conventions
+
+- Use the **Svelte MCP server** (`list-sections` → `get-documentation` → `svelte-autofixer`) when working on Svelte code
+- Record design and architectural decisions in `./docs`
+- `extractYear()` helper is currently duplicated in 3 route files — follow existing pattern until centralized
+- The `build/` directory is committed for deployment — rebuild after content/code changes
+
+## Svelte MCP Tools
+
+Use the Svelte MCP server for comprehensive Svelte 5/SvelteKit documentation:
+
+1. **list-sections** — discover available docs sections (use FIRST)
+2. **get-documentation** — fetch full docs for relevant sections
+3. **svelte-autofixer** — analyze Svelte code for issues (use before finalizing any Svelte code)
+4. **playground-link** — generate playground link (only after user confirms, never when writing to project files)
