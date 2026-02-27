@@ -1,11 +1,6 @@
 ---
 title: Contact
-lead: "<p class=\"muted\">Caveat: I am usually booked at least one year ahead for durations longer than a weekend.<br /> I do not participate in projects without assuming some degree of artistic responsibility.</p>"
 ---
-
-<div class="page-header">
-<h1>Contact <small>adresses, networks and affiliations</small></h1>
-</div>
 
 <div class="row">
  <div class="span8">

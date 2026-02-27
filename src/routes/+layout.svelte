@@ -7,9 +7,9 @@
 	let { children }: { children: Snippet } = $props();
 </script>
 
-<div class="flex min-h-screen flex-col">
+<div>
 	<Header />
-	<main class="flex-1">
+	<main>
 		{@render children()}
 	</main>
 	<Footer />
