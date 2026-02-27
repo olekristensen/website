@@ -16,7 +16,7 @@
 <article>
 	<header class="pt-32 pb-16 md:pb-20">
 		<div class="narrow-width">
-			<a href="/consultancies" class="hover-line mb-8 inline-block text-xs font-medium tracking-widest text-[var(--color-ink-subtle)] uppercase">Consultancies</a>
+			<a href="/consultancies" class="hover-line section-label mb-8">Consultancies</a>
 			<h1 class="font-display text-[clamp(2rem,5vw,4rem)]">{data.item.meta.title}</h1>
 			{#if data.item.meta.date}
 				<p class="mt-4 text-sm text-[var(--color-ink-subtle)]">{data.item.meta.date}</p>

@@ -4,16 +4,17 @@
 
 <nav class="fixed top-0 z-50 w-full mix-blend-difference">
 	<div class="content-width flex items-center justify-between py-5">
-		<a href="/" class="font-display text-lg tracking-tight text-white">
+		<a href="/" class="flex items-center gap-2 font-display text-lg tracking-tight text-white">
+			<span class="neon-dot"></span>
 			ole kristensen
 		</a>
 
 		<!-- Desktop nav -->
 		<ul class="hidden gap-8 md:flex">
-			<li><a href="/works" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-white">Works</a></li>
-			<li><a href="/consultancies" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-white">Consultancies</a></li>
-			<li><a href="/about" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-white">About</a></li>
-			<li><a href="/contact" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-white">Contact</a></li>
+			<li><a href="/works" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-[var(--color-neon)]">Works</a></li>
+			<li><a href="/consultancies" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-[var(--color-neon)]">Consultancies</a></li>
+			<li><a href="/about" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-[var(--color-neon)]">About</a></li>
+			<li><a href="/contact" class="text-sm tracking-wide text-white/70 uppercase transition-colors duration-300 hover:text-[var(--color-neon)]">Contact</a></li>
 		</ul>
 
 		<!-- Mobile toggle -->
@@ -36,9 +37,9 @@
 	role="dialog"
 	aria-modal="true"
 >
-	<a href="/works" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-white">Works</a>
-	<a href="/consultancies" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-white">Consultancies</a>
-	<a href="/about" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-white">About</a>
-	<a href="/contact" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-white">Contact</a>
+	<a href="/works" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">Works</a>
+	<a href="/consultancies" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">Consultancies</a>
+	<a href="/about" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">About</a>
+	<a href="/contact" onclick={() => menuOpen = false} class="font-display text-3xl text-white/80 transition-colors hover:text-[var(--color-neon)]">Contact</a>
 </div>
 {/if}

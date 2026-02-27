@@ -12,7 +12,7 @@
 <article>
 	<header class="pt-32 pb-16 md:pb-20">
 		<div class="narrow-width">
-			<p class="mb-4 text-xs font-medium tracking-widest text-[var(--color-ink-subtle)] uppercase">About</p>
+			<p class="section-label mb-4">About</p>
 			<h1 class="font-display text-[clamp(2.5rem,6vw,5rem)]">{data.item.meta.title || 'About'}</h1>
 		</div>
 	</header>
@@ -63,7 +63,7 @@
 		transition: text-decoration-color 0.3s;
 	}
 	.prose :global(a:hover) {
-		text-decoration-color: var(--color-ink);
+		text-decoration-color: var(--color-neon);
 	}
 	.prose :global(blockquote) {
 		border-left: 2px solid var(--color-border);

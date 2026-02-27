@@ -17,7 +17,7 @@
 	<!-- Header -->
 	<header class="pt-32 pb-16 md:pb-20">
 		<div class="narrow-width">
-			<a href="/works" class="hover-line mb-8 inline-block text-xs font-medium tracking-widest text-[var(--color-ink-subtle)] uppercase">Works</a>
+			<a href="/works" class="hover-line section-label mb-8">Works</a>
 			<h1 class="font-display text-[clamp(2rem,5vw,4rem)]">{data.item.meta.title}</h1>
 			{#if data.item.meta.lead}
 				<p class="mt-4 text-lg text-[var(--color-ink-muted)]">{data.item.meta.lead}</p>

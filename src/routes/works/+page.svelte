@@ -10,7 +10,7 @@
 
 <section class="pt-32 pb-20 md:pb-28">
 	<div class="content-width">
-		<p class="mb-4 text-xs font-medium tracking-widest text-[var(--color-ink-subtle)] uppercase">Works</p>
+		<p class="section-label mb-4">Works</p>
 		<h1 class="font-display text-[clamp(2.5rem,6vw,5rem)]">Projects &amp; Installations</h1>
 		<p class="mt-4 max-w-xl text-[var(--color-ink-muted)]">A selection of projects spanning interactive installations, live performances, and commissioned work.</p>
 	</div>
@@ -20,7 +20,7 @@
 	<div class="content-width">
 		<div class="grid gap-px bg-[var(--color-border-subtle)] sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.items as item (item.slug)}
-				<a href="/works/{item.slug}" class="group flex flex-col bg-[var(--color-surface)] transition-colors duration-300 hover:bg-[var(--color-surface-warm)]">
+				<a href="/works/{item.slug}" class="card-hover group flex flex-col bg-[var(--color-surface)] hover:bg-[var(--color-surface-warm)]">
 					{#if item.images.thumb}
 						<div class="aspect-[4/3] overflow-hidden">
 							<img
