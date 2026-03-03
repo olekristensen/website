@@ -42,6 +42,9 @@
 		"onlyBuiltDependencies": [
 			"esbuild",
 			"sharp"
+		],
+		"ignoredBuiltDependencies": [
+			"svelte-preprocess"
 		]
 	},
 	"dependencies": {
