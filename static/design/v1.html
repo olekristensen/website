@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V1 — Voronoi Shatter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --surface: oklch(0.98 0.003 100);
+      --ink: oklch(0.12 0.01 260);
+      --ink-secondary: oklch(0.50 0.01 260);
+      --accent: oklch(0.75 0.30 150);
+      --border: oklch(0.93 0.003 100);
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --max-w: 1280px;
+      --gutter: clamp(1.5rem, 5vw, 4rem);
+      --nav-h: 3.25rem;
+    }
+    body {
+      font-family: var(--font-body); background: var(--surface); color: var(--ink);
+      line-height: 1.6; font-weight: 300; -webkit-font-smoothing: antialiased;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: oklch(from var(--surface) l c h / 0.85);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 var(--gutter);
+      display: flex; justify-content: space-between; align-items: center;
+      height: var(--nav-h);
+    }
+    .nav-brand {
+      font-family: var(--font-heading); font-size: 1rem; font-weight: 500;
+      color: var(--ink); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 1.75rem; list-style: none; }
+    .nav-links a { color: var(--ink-secondary); text-decoration: none; font-family: var(--font-heading); font-size: 0.78rem; font-weight: 400; letter-spacing: 0.03em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+
+    .hero {
+      min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+      align-items: end; padding: 0 var(--gutter); padding-top: var(--nav-h);
+      max-width: var(--max-w); margin: 0 auto; gap: 2rem;
+    }
+    .hero-text { padding-bottom: clamp(4rem, 10vh, 8rem); }
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(3rem, 8vw, 6rem); font-weight: 700;
+      line-height: 0.92; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+    }
+    .hero-sub { font-size: 1rem; line-height: 1.7; color: var(--ink-secondary); max-width: 35ch; margin-bottom: 1.5rem; }
+    .hero-accent-bar { width: 4rem; height: 3px; background: var(--accent); margin-bottom: 1rem; }
+    .hero-location { font-family: var(--font-heading); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-secondary); }
+
+    .hero-voronoi {
+      position: relative;
+      align-self: stretch;
+      display: flex; align-items: flex-end;
+      padding-bottom: clamp(4rem, 10vh, 8rem);
+    }
+    .hero-voronoi canvas {
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
+      object-fit: cover;
+    }
+
+    .design-label {
+      position: fixed; top: 5rem; left: var(--gutter); z-index: 99;
+      font-family: var(--font-heading); font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ink-secondary); opacity: 0.5; font-weight: 500;
+    }
+
+    .section { padding: clamp(5rem, 10vw, 10rem) var(--gutter); }
+    .section-inner { max-width: var(--max-w); margin: 0 auto; }
+    footer { border-top: 1px solid var(--border); padding: 2.5rem var(--gutter); }
+    .footer-inner { max-width: var(--max-w); margin: 0 auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ink-secondary); }
+
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-voronoi { min-height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="design-label">V1 — Voronoi Shatter: each cell shows a different work, cells shatter &amp; reassemble on transition</div>
+
+  <nav><div class="nav-inner">
+    <a href="#" class="nav-brand">Ole Kristensen</a>
+    <ul class="nav-links">
+      <li><a href="#">Works</a></li><li><a href="#">Consultancies</a></li>
+      <li><a href="#">About</a></li><li><a href="#">Contact</a></li>
+    </ul>
+  </div></nav>
+
+  <section class="hero" id="hero">
+    <div class="hero-text">
+      <h1>Ole<br>Kristensen</h1>
+      <div class="hero-accent-bar"></div>
+      <p class="hero-sub">Software artist &amp; design technologist — interactive installations, live performances and bespoke systems.</p>
+      <p class="hero-location">Copenhagen, DK</p>
+    </div>
+    <div class="hero-voronoi">
+      <canvas id="voronoi"></canvas>
+    </div>
+  </section>
+
+  <section class="section"><div class="section-inner">
+    <p style="color: var(--ink-secondary); font-size: 0.9rem;">↑ Voronoi hero — scroll up to see the effect. Each cell shows a different work thumbnail. On transition, each cell independently shatters (explodes outward with rotation) then new image cells reassembles inward.</p>
+  </div></section>
+
+  <footer><div class="footer-inner"><p>&copy; 2026 Ole Kristensen</p></div></footer>
+
+  <script>
+    /*
+     * V1 — VORONOI SHATTER
+     *
+     * A Voronoi tessellation fills the hero column. Each cell is textured
+     * with a different work thumbnail. Every ~5s, a transition fires:
+     * all cells "shatter" — they translate outward from center, rotate
+     * slightly, and fade — then the next image fills all cells and they
+     * reassemble inward. The result looks like a mosaic exploding and
+     * reforming with new content.
+     *
+     * The Voronoi seeds are placed with relaxed Lloyd's iteration for
+     * even, organic spacing.
+     */
+
+    const WORKS = [
+      'body-navigation', 'digital-weather', 'frost', 'fuck-you-buddy',
+      'getting-back-in-the-whole', 'inland', 'living-room', 'longing-fast-forward',
+      'malpais', 'multiplicity', 'oresund', 'stereo', 'stereograhpy-workshop',
+      'stop-motion', 'timemap-3', 'trae', 'work-in-progress'
+    ];
+
+    const CELL_COUNT = 24;
+    const TRANSITION_DURATION = 1200; // ms
+    const HOLD_DURATION = 5000; // ms between transitions
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    const canvas = document.getElementById('voronoi');
+    const ctx = canvas.getContext('2d');
+    let W, H, seeds, currentIdx = 0, images = [], ready = false;
+
+    // Preload images
+    function loadImages() {
+      let loaded = 0;
+      WORKS.forEach((slug, i) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        // Use 960 for 1x, 1920 for 2x
+        const size = DPR > 1 ? 1920 : 960;
+        img.src = `/content/works/${slug}/thumb-${size}.jpg`;
+        img.onload = () => { loaded++; if (loaded === WORKS.length) { ready = true; startSlideshow(); } };
+        img.onerror = () => { loaded++; if (loaded === WORKS.length) { ready = true; startSlideshow(); } };
+        images[i] = img;
+      });
+    }
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = W * DPR;
+      canvas.height = H * DPR;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      generateSeeds();
+      if (ready) drawFrame(0, currentIdx, currentIdx);
+    }
+
+    // Generate Voronoi seeds with Lloyd relaxation
+    function generateSeeds() {
+      seeds = [];
+      for (let i = 0; i < CELL_COUNT; i++) {
+        seeds.push({ x: Math.random() * W, y: Math.random() * H });
+      }
+      // 3 iterations of Lloyd relaxation
+      for (let iter = 0; iter < 3; iter++) {
+        const regions = seeds.map(() => ({ sx: 0, sy: 0, count: 0 }));
+        const step = 4;
+        for (let y = 0; y < H; y += step) {
+          for (let x = 0; x < W; x += step) {
+            let minD = Infinity, minI = 0;
+            for (let i = 0; i < seeds.length; i++) {
+              const dx = x - seeds[i].x, dy = y - seeds[i].y;
+              const d = dx * dx + dy * dy;
+              if (d < minD) { minD = d; minI = i; }
+            }
+            regions[minI].sx += x;
+            regions[minI].sy += y;
+            regions[minI].count++;
+          }
+        }
+        for (let i = 0; i < seeds.length; i++) {
+          if (regions[i].count > 0) {
+            seeds[i].x = regions[i].sx / regions[i].count;
+            seeds[i].y = regions[i].sy / regions[i].count;
+          }
+        }
+      }
+    }
+
+    // Find Voronoi cell for each pixel (brute force, used for clipping paths)
+    function getCellPath(seedIdx) {
+      // Build polygon via scanning — but for perf, use clip regions
+      // Instead, we'll compute the Voronoi polygon edges
+      // For simplicity, use a different approach: for each seed, find the
+      // convex polygon by intersecting half-planes with neighbors
+      const s = seeds[seedIdx];
+      // Start with a large bounding box
+      let poly = [
+        { x: -50, y: -50 }, { x: W + 50, y: -50 },
+        { x: W + 50, y: H + 50 }, { x: -50, y: H + 50 }
+      ];
+
+      for (let j = 0; j < seeds.length; j++) {
+        if (j === seedIdx) continue;
+        const other = seeds[j];
+        // Bisector: midpoint and perpendicular
+        const mx = (s.x + other.x) / 2, my = (s.y + other.y) / 2;
+        const dx = other.x - s.x, dy = other.y - s.y;
+        // Keep the half-plane on the side of s
+        poly = clipPolygon(poly, mx, my, dx, dy);
+        if (poly.length === 0) break;
+      }
+      return poly;
+    }
+
+    function clipPolygon(poly, px, py, nx, ny) {
+      // Clip polygon to half-plane: points where dot((p - px,py), (nx,ny)) <= 0
+      const out = [];
+      for (let i = 0; i < poly.length; i++) {
+        const a = poly[i], b = poly[(i + 1) % poly.length];
+        const da = (a.x - px) * nx + (a.y - py) * ny;
+        const db = (b.x - px) * nx + (b.y - py) * ny;
+        if (da <= 0) out.push(a);
+        if ((da <= 0) !== (db <= 0)) {
+          const t = da / (da - db);
+          out.push({ x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) });
+        }
+      }
+      return out;
+    }
+
+    function drawFrame(progress, fromIdx, toIdx) {
+      ctx.clearRect(0, 0, W, H);
+      const imgFrom = images[fromIdx % images.length];
+      const imgTo = images[toIdx % images.length];
+      const centerX = W / 2, centerY = H / 2;
+
+      for (let i = 0; i < seeds.length; i++) {
+        const poly = getCellPath(i);
+        if (poly.length < 3) continue;
+
+        ctx.save();
+
+        if (progress > 0 && progress <= 0.5 && fromIdx !== toIdx) {
+          // Shatter out phase (0→0.5)
+          const p = progress / 0.5; // 0→1
+          const ease = p * p; // ease-in
+          const angle = (Math.random() * 0.3 - 0.15) * ease;
+          const dirX = seeds[i].x - centerX, dirY = seeds[i].y - centerY;
+          const dist = Math.sqrt(dirX * dirX + dirY * dirY);
+          const normX = dist > 0 ? dirX / dist : 0, normY = dist > 0 ? dirY / dist : 0;
+          const explode = ease * 80;
+
+          ctx.translate(seeds[i].x, seeds[i].y);
+          ctx.rotate(angle);
+          ctx.translate(-seeds[i].x + normX * explode, -seeds[i].y + normY * explode);
+          ctx.globalAlpha = 1 - ease * 0.7;
+
+          drawCellImage(poly, imgFrom);
+        } else if (progress > 0.5 && fromIdx !== toIdx) {
+          // Reassemble phase (0.5→1)
+          const p = (progress - 0.5) / 0.5; // 0→1
+          const ease = 1 - (1 - p) * (1 - p); // ease-out
+          const angle = (Math.random() * 0.3 - 0.15) * (1 - ease);
+          const dirX = seeds[i].x - centerX, dirY = seeds[i].y - centerY;
+          const dist = Math.sqrt(dirX * dirX + dirY * dirY);
+          const normX = dist > 0 ? dirX / dist : 0, normY = dist > 0 ? dirY / dist : 0;
+          const explode = (1 - ease) * 80;
+
+          ctx.translate(seeds[i].x, seeds[i].y);
+          ctx.rotate(angle);
+          ctx.translate(-seeds[i].x + normX * explode, -seeds[i].y + normY * explode);
+          ctx.globalAlpha = 0.3 + ease * 0.7;
+
+          drawCellImage(poly, imgTo);
+        } else {
+          // Static
+          ctx.globalAlpha = 1;
+          drawCellImage(poly, fromIdx === toIdx ? imgFrom : imgTo);
+        }
+
+        ctx.restore();
+      }
+
+      // Draw thin cell borders
+      ctx.globalAlpha = 0.08;
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#1a1a1a';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < seeds.length; i++) {
+        const poly = getCellPath(i);
+        if (poly.length < 3) continue;
+        ctx.beginPath();
+        ctx.moveTo(poly[0].x, poly[0].y);
+        for (let j = 1; j < poly.length; j++) ctx.lineTo(poly[j].x, poly[j].y);
+        ctx.closePath();
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function drawCellImage(poly, img) {
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+      ctx.beginPath();
+      ctx.moveTo(poly[0].x, poly[0].y);
+      for (let j = 1; j < poly.length; j++) ctx.lineTo(poly[j].x, poly[j].y);
+      ctx.closePath();
+      ctx.clip();
+
+      // Cover the canvas area with the image
+      const imgAspect = img.naturalWidth / img.naturalHeight;
+      const canvasAspect = W / H;
+      let drawW, drawH, drawX, drawY;
+      if (imgAspect > canvasAspect) {
+        drawH = H; drawW = H * imgAspect;
+        drawX = (W - drawW) / 2; drawY = 0;
+      } else {
+        drawW = W; drawH = W / imgAspect;
+        drawX = 0; drawY = (H - drawH) / 2;
+      }
+      ctx.drawImage(img, drawX, drawY, drawW, drawH);
+    }
+
+    // Stable random for consistent shatter directions per frame
+    // We re-seed Math.random is fine since it's per-draw
+    let animFrame, transitionStart, transitioning = false;
+    let fromIdx = 0, toIdx = 0;
+
+    function startSlideshow() {
+      drawFrame(0, currentIdx, currentIdx);
+      setInterval(() => {
+        fromIdx = currentIdx;
+        toIdx = (currentIdx + 1) % images.length;
+        transitioning = true;
+        transitionStart = performance.now();
+        animate();
+      }, HOLD_DURATION);
+    }
+
+    function animate() {
+      if (!transitioning) return;
+      const elapsed = performance.now() - transitionStart;
+      const progress = Math.min(elapsed / TRANSITION_DURATION, 1);
+
+      // Use seeded pseudo-random for consistent per-cell directions within a transition
+      const savedRandom = Math.random;
+      let rngSeed = fromIdx * 1000 + toIdx;
+      const seededRandom = () => { rngSeed = (rngSeed * 16807 + 0) % 2147483647; return rngSeed / 2147483647; };
+      Math.random = seededRandom;
+
+      drawFrame(progress, fromIdx, toIdx);
+
+      Math.random = savedRandom;
+
+      if (progress >= 1) {
+        currentIdx = toIdx;
+        transitioning = false;
+      } else {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    loadImages();
+  </script>
+</body>
+</html>

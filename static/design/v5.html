@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V5 — Voronoi Glass</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --surface: oklch(0.98 0.003 100);
+      --ink: oklch(0.12 0.01 260);
+      --ink-secondary: oklch(0.50 0.01 260);
+      --accent: oklch(0.75 0.30 150);
+      --border: oklch(0.93 0.003 100);
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --max-w: 1280px;
+      --gutter: clamp(1.5rem, 5vw, 4rem);
+      --nav-h: 3.25rem;
+    }
+    body {
+      font-family: var(--font-body); background: var(--surface); color: var(--ink);
+      line-height: 1.6; font-weight: 300; -webkit-font-smoothing: antialiased;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: oklch(from var(--surface) l c h / 0.85);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 var(--gutter);
+      display: flex; justify-content: space-between; align-items: center;
+      height: var(--nav-h);
+    }
+    .nav-brand {
+      font-family: var(--font-heading); font-size: 1rem; font-weight: 500;
+      color: var(--ink); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 1.75rem; list-style: none; }
+    .nav-links a { color: var(--ink-secondary); text-decoration: none; font-family: var(--font-heading); font-size: 0.78rem; font-weight: 400; letter-spacing: 0.03em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+
+    .hero {
+      min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+      align-items: end; padding: 0 var(--gutter); padding-top: var(--nav-h);
+      max-width: var(--max-w); margin: 0 auto; gap: 2rem;
+    }
+    .hero-text { padding-bottom: clamp(4rem, 10vh, 8rem); }
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(3rem, 8vw, 6rem); font-weight: 700;
+      line-height: 0.92; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+    }
+    .hero-sub { font-size: 1rem; line-height: 1.7; color: var(--ink-secondary); max-width: 35ch; margin-bottom: 1.5rem; }
+    .hero-accent-bar { width: 4rem; height: 3px; background: var(--accent); margin-bottom: 1rem; }
+    .hero-location { font-family: var(--font-heading); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-secondary); }
+
+    .hero-voronoi {
+      position: relative;
+      align-self: stretch;
+      display: flex; align-items: flex-end;
+      padding-bottom: clamp(4rem, 10vh, 8rem);
+      cursor: default;
+    }
+    .hero-voronoi canvas {
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
+    }
+
+    .design-label {
+      position: fixed; top: 5rem; left: var(--gutter); z-index: 99;
+      font-family: var(--font-heading); font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ink-secondary); opacity: 0.5; font-weight: 500;
+    }
+    .section { padding: clamp(5rem, 10vw, 10rem) var(--gutter); }
+    .section-inner { max-width: var(--max-w); margin: 0 auto; }
+    footer { border-top: 1px solid var(--border); padding: 2.5rem var(--gutter); }
+    .footer-inner { max-width: var(--max-w); margin: 0 auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ink-secondary); }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-voronoi { min-height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="design-label">V5 — Voronoi Glass: virtual cursor ring sweeps outward during transitions, same proximity + seed wobble as mouse</div>
+
+  <nav><div class="nav-inner">
+    <a href="#" class="nav-brand">Ole Kristensen</a>
+    <ul class="nav-links">
+      <li><a href="#">Works</a></li><li><a href="#">Consultancies</a></li>
+      <li><a href="#">About</a></li><li><a href="#">Contact</a></li>
+    </ul>
+  </div></nav>
+
+  <section class="hero" id="hero">
+    <div class="hero-text">
+      <h1>Ole<br>Kristensen</h1>
+      <div class="hero-accent-bar"></div>
+      <p class="hero-sub">Software artist &amp; design technologist — interactive installations, live performances and bespoke systems.</p>
+      <p class="hero-location">Copenhagen, DK</p>
+    </div>
+    <div class="hero-voronoi" id="voronoi-container">
+      <canvas id="voronoi"></canvas>
+    </div>
+  </section>
+
+  <section class="section"><div class="section-inner">
+    <p style="color: var(--ink-secondary); font-size: 0.9rem;">↑ Voronoi Glass — at rest the image appears perfectly assembled. Move your mouse anywhere on the page, touch, or tilt your device to shatter the image into glass-shard refractions. Each cell displaces the image beneath it uniquely. Transitions use V4's crystallization grow. The tessellation is invisible — you only see it through the refraction differences.</p>
+  </div></section>
+
+  <footer><div class="footer-inner"><p>&copy; 2026 Ole Kristensen</p></div></footer>
+
+  <script>
+    const WORKS = [
+      'body-navigation', 'digital-weather', 'frost', 'fuck-you-buddy',
+      'getting-back-in-the-whole', 'inland', 'living-room', 'longing-fast-forward',
+      'malpais', 'multiplicity', 'oresund', 'stereo', 'stereograhpy-workshop',
+      'stop-motion', 'timemap-3', 'trae', 'work-in-progress'
+    ];
+
+    const CELL_COUNT = 32;
+    const CELL_FLIP_DURATION = 1200;
+    const WAVE_DELAY = 180;
+    const HOLD_DURATION = 10000;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    // Refraction: max px displacement per cell shard
+    const REFRACT_MAX = 20;
+    // Extra cover padding to prevent edge bleed (must be >= REFRACT_MAX)
+    const COVER_PAD = REFRACT_MAX + 10;
+    // Mouse influence radius for per-cell refraction activity
+    const MOUSE_REFRACT_RADIUS = 350;
+    // Mouse influence on seed positions
+    const MOUSE_RADIUS = 220;
+    const MOUSE_SEED_STRENGTH = 25;
+    // Damping for smooth seed animation
+    const SEED_DAMPING = 0.07;
+    // Global activity (mouse/touch/gyro stimulus)
+    const ACTIVITY_ATTACK = 0.08;
+    const ACTIVITY_DECAY = 0.012;
+    const ACTIVITY_GRACE = 150;
+    // How long the wave "touches" each cell (ms) — like a virtual cursor lingering
+    const WAVE_TOUCH_DURATION = 500;
+    // Virtual cursor ring: speed (px/ms) and width (proximity radius)
+    const WAVE_SPEED = 0.65;  // ~120px per 180ms BFS delay
+    const WAVE_RING_WIDTH = MOUSE_REFRACT_RADIUS;  // same proximity radius as mouse
+
+    const canvas = document.getElementById('voronoi');
+    const container = document.getElementById('voronoi-container');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    let baseSeeds = [];
+    let seeds = [];
+    let targetSeeds = [];
+    let cellPolys = [];
+    let adjacency = [];
+    let cellRefractions = [];
+    let currentIdx = 0, images = [], ready = false;
+
+    // --- Activity system ---
+    // Global activity from mouse/touch/gyro
+    let activityLevel = 0;
+    let lastStimulusTime = 0;
+
+    // Per-cell activity: each cell has its own level, attack rate, and decay rate
+    let cellActivityLevels = [];
+    let cellActivityVelocities = [];  // smoothed velocity for momentum-based settling
+    let cellAttackRates = [];  // how fast each cell ramps up
+    let cellDecayRates = [];   // how fast each cell settles (unique per cell)
+
+    // Mouse state (page coords)
+    let pageMouseX = -9999, pageMouseY = -9999;
+    // Canvas-local mouse coords (derived each frame)
+    let canvasMouseX = -9999, canvasMouseY = -9999;
+    let mouseOverCanvas = false;
+
+    // Direction vector from canvas center to mouse (normalized, for global refraction bias)
+    let dirX = 0, dirY = 0;
+
+    // Device orientation / motion
+    let deviceTiltX = 0, deviceTiltY = 0;
+    let prevBeta = null, prevGamma = null;
+
+    // --- Drag / click interaction ---
+    let pointerDown = false;
+    let pointerDownX = 0, pointerDownY = 0;
+    let isDragging = false;
+    const DRAG_THRESHOLD = 6; // px movement to distinguish drag from click
+    // Per-cell drag reveal: 0 = showing current image, 1 = fully revealed next image
+    let cellDragReveal = new Array(CELL_COUNT).fill(0);
+    const DRAG_FADE_SPEED = 0.06; // how fast a cell fades to next during drag
+    const DRAG_REVERT_SPEED = 0.02; // how fast un-dragged cells revert
+
+    // ===== Image loading =====
+    function loadImages() {
+      let loaded = 0;
+      WORKS.forEach((slug, i) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const size = DPR > 1 ? 1920 : 960;
+        img.src = `/content/works/${slug}/thumb-${size}.jpg`;
+        img.onload = () => { loaded++; if (loaded === WORKS.length) { ready = true; startSlideshow(); } };
+        img.onerror = () => { loaded++; if (loaded === WORKS.length) { ready = true; startSlideshow(); } };
+        images[i] = img;
+      });
+    }
+
+    // ===== Resize =====
+    function resize() {
+      const rect = container.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = W * DPR;
+      canvas.height = H * DPR;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      generateSeeds();
+      seeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
+      targetSeeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
+      generateRefractions();
+      recomputePolys();
+      computeAdjacency();
+    }
+
+    // ===== Voronoi seed generation + Lloyd relaxation =====
+    function generateSeeds() {
+      let rng = 77;
+      const rand = () => { rng = (rng * 16807) % 2147483647; return rng / 2147483647; };
+      baseSeeds = [];
+      for (let i = 0; i < CELL_COUNT; i++) {
+        baseSeeds.push({ x: rand() * W, y: rand() * H });
+      }
+      for (let iter = 0; iter < 5; iter++) {
+        const regions = baseSeeds.map(() => ({ sx: 0, sy: 0, count: 0 }));
+        const step = 3;
+        for (let y = 0; y < H; y += step) {
+          for (let x = 0; x < W; x += step) {
+            let minD = Infinity, minI = 0;
+            for (let i = 0; i < baseSeeds.length; i++) {
+              const dx = x - baseSeeds[i].x, dy = y - baseSeeds[i].y;
+              const d = dx * dx + dy * dy;
+              if (d < minD) { minD = d; minI = i; }
+            }
+            regions[minI].sx += x;
+            regions[minI].sy += y;
+            regions[minI].count++;
+          }
+        }
+        for (let i = 0; i < baseSeeds.length; i++) {
+          if (regions[i].count > 0) {
+            baseSeeds[i].x = regions[i].sx / regions[i].count;
+            baseSeeds[i].y = regions[i].sy / regions[i].count;
+          }
+        }
+      }
+    }
+
+    // ===== Per-cell refraction offsets + individual timing character =====
+    function generateRefractions() {
+      let rng = 123;
+      const rand = () => { rng = (rng * 16807) % 2147483647; return (rng / 2147483647) * 2 - 1; };
+      const rand01 = () => { rng = (rng * 16807) % 2147483647; return rng / 2147483647; };
+      cellRefractions = [];
+      cellActivityLevels = [];
+      cellActivityVelocities = [];
+      cellAttackRates = [];
+      cellDecayRates = [];
+      for (let i = 0; i < CELL_COUNT; i++) {
+        cellRefractions.push({
+          dx: rand() * REFRACT_MAX,
+          dy: rand() * REFRACT_MAX
+        });
+        cellActivityLevels.push(0);
+        cellActivityVelocities.push(0);
+        // Each cell rises and settles at its own pace
+        cellAttackRates.push(0.02 + rand01() * 0.04);  // 0.02–0.06
+        cellDecayRates.push(0.004 + rand01() * 0.012);  // 0.004–0.016
+      }
+    }
+
+    // ===== Polygon clipping =====
+    function clipPolygon(poly, px, py, nx, ny) {
+      const out = [];
+      for (let i = 0; i < poly.length; i++) {
+        const a = poly[i], b = poly[(i + 1) % poly.length];
+        const da = (a.x - px) * nx + (a.y - py) * ny;
+        const db = (b.x - px) * nx + (b.y - py) * ny;
+        if (da <= 0) out.push(a);
+        if ((da <= 0) !== (db <= 0)) {
+          const t = da / (da - db);
+          out.push({ x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) });
+        }
+      }
+      return out;
+    }
+
+    function recomputePolys() {
+      cellPolys = [];
+      for (let i = 0; i < seeds.length; i++) {
+        let poly = [
+          { x: -10, y: -10 }, { x: W + 10, y: -10 },
+          { x: W + 10, y: H + 10 }, { x: -10, y: H + 10 }
+        ];
+        for (let j = 0; j < seeds.length; j++) {
+          if (j === i) continue;
+          const mx = (seeds[i].x + seeds[j].x) / 2, my = (seeds[i].y + seeds[j].y) / 2;
+          const dx = seeds[j].x - seeds[i].x, dy = seeds[j].y - seeds[i].y;
+          poly = clipPolygon(poly, mx, my, dx, dy);
+          if (poly.length === 0) break;
+        }
+        cellPolys[i] = poly;
+      }
+    }
+
+    // ===== Adjacency for BFS =====
+    function computeAdjacency() {
+      adjacency = seeds.map(() => []);
+      const step = 4;
+      const grid = {};
+      for (let y = 0; y < H; y += step) {
+        for (let x = 0; x < W; x += step) {
+          let minD = Infinity, minI = 0;
+          for (let i = 0; i < seeds.length; i++) {
+            const dx = x - seeds[i].x, dy = y - seeds[i].y;
+            const d = dx * dx + dy * dy;
+            if (d < minD) { minD = d; minI = i; }
+          }
+          grid[`${Math.floor(x / step)},${Math.floor(y / step)}`] = minI;
+        }
+      }
+      const pairs = new Set();
+      for (let y = 0; y < H; y += step) {
+        for (let x = 0; x < W; x += step) {
+          const gx = Math.floor(x / step), gy = Math.floor(y / step);
+          const cell = grid[`${gx},${gy}`];
+          for (const [ddx, ddy] of [[1, 0], [0, 1]]) {
+            const key = `${gx + ddx},${gy + ddy}`;
+            if (key in grid && grid[key] !== cell) {
+              const a = Math.min(cell, grid[key]);
+              const b = Math.max(cell, grid[key]);
+              const pk = `${a}-${b}`;
+              if (!pairs.has(pk)) {
+                pairs.add(pk);
+                adjacency[a].push(b);
+                adjacency[b].push(a);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // ===== Cover-fit image with oversized padding (prevents edge bleed) =====
+    function coverParams(img, offsetX, offsetY) {
+      if (!img || !img.complete || img.naturalWidth === 0) return null;
+      const imgAspect = img.naturalWidth / img.naturalHeight;
+      // Size the image to cover (W + 2*pad) × (H + 2*pad)
+      const targetW = W + COVER_PAD * 2;
+      const targetH = H + COVER_PAD * 2;
+      const targetAspect = targetW / targetH;
+      let dw, dh;
+      if (imgAspect > targetAspect) {
+        dh = targetH; dw = dh * imgAspect;
+      } else {
+        dw = targetW; dh = dw / imgAspect;
+      }
+      // Center on the W×H canvas → image extends ≥ pad beyond every edge
+      const dx = (W - dw) / 2;
+      const dy = (H - dh) / 2;
+      return { dx: dx + (offsetX || 0), dy: dy + (offsetY || 0), dw, dh };
+    }
+
+    // Expand polygon outward by `amount` px to eliminate antialiasing gaps
+    function expandPoly(poly, amount) {
+      const n = poly.length;
+      if (n < 3) return poly;
+      // Compute centroid
+      let cx = 0, cy = 0;
+      for (let i = 0; i < n; i++) { cx += poly[i].x; cy += poly[i].y; }
+      cx /= n; cy /= n;
+      // Push each vertex outward from centroid
+      return poly.map(p => {
+        const dx = p.x - cx, dy = p.y - cy;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 0.01) return p;
+        return { x: p.x + (dx / d) * amount, y: p.y + (dy / d) * amount };
+      });
+    }
+
+    function drawClippedImage(poly, img, refractDx, refractDy) {
+      const params = coverParams(img, refractDx, refractDy);
+      if (!params || poly.length < 3) return;
+      // Expand clip polygon slightly so adjacent cells overlap, hiding AA gaps
+      const expanded = expandPoly(poly, 0.75);
+      ctx.beginPath();
+      ctx.moveTo(expanded[0].x, expanded[0].y);
+      for (let j = 1; j < expanded.length; j++) ctx.lineTo(expanded[j].x, expanded[j].y);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(img, params.dx, params.dy, params.dw, params.dh);
+    }
+
+    // ===== Per-cell shading overlay =====
+    // Uses refraction vector as pseudo-surface-normal, dots with light direction
+    // to produce subtle highlight/shadow. Invisible at rest (activity 0).
+    const SHADE_MAX_ALPHA = 0.25;
+    function shadeCellPoly(poly, cellIdx, cellActivity) {
+      if (cellActivity < 0.005) return; // invisible, skip
+      const ref = cellRefractions[cellIdx];
+      // Normalize the refraction vector as a pseudo-normal
+      const mag = Math.sqrt(ref.dx * ref.dx + ref.dy * ref.dy);
+      if (mag < 0.1) return;
+      const nx = ref.dx / mag, ny = ref.dy / mag;
+      // Light direction: from mouse or virtual cursor ring
+      let lx = dirX || 0, ly = dirY || 0;
+      if (mouseOverCanvas) {
+        const sdx = canvasMouseX - seeds[cellIdx].x;
+        const sdy = canvasMouseY - seeds[cellIdx].y;
+        const sdist = Math.sqrt(sdx * sdx + sdy * sdy);
+        if (sdist > 1) {
+          lx = sdx / sdist;
+          ly = sdy / sdist;
+        }
+      } else if (waveCursorActive) {
+        // Use wave origin as light source during transition
+        const wdx = waveOriginX - seeds[cellIdx].x;
+        const wdy = waveOriginY - seeds[cellIdx].y;
+        const wdist = Math.sqrt(wdx * wdx + wdy * wdy);
+        if (wdist > 1) {
+          lx = wdx / wdist;
+          ly = wdy / wdist;
+        }
+      }
+      // Dot product: positive = facing light (highlight), negative = facing away (shadow)
+      const dot = nx * lx + ny * ly;
+      const alpha = Math.abs(dot) * cellActivity * SHADE_MAX_ALPHA;
+      if (alpha < 0.002) return;
+      const expanded = expandPoly(poly, 0.75);
+      ctx.beginPath();
+      ctx.moveTo(expanded[0].x, expanded[0].y);
+      for (let j = 1; j < expanded.length; j++) ctx.lineTo(expanded[j].x, expanded[j].y);
+      ctx.closePath();
+      ctx.fillStyle = dot > 0 ? `rgba(255,255,255,${alpha})` : `rgba(0,0,0,${alpha})`;
+      ctx.fill();
+    }
+
+    // ===== Input: mouse (page-wide) =====
+    document.addEventListener('mousemove', (e) => {
+      pageMouseX = e.clientX;
+      pageMouseY = e.clientY;
+      lastStimulusTime = performance.now();
+
+      // Drag detection
+      if (pointerDown) {
+        const ddx = e.clientX - pointerDownX;
+        const ddy = e.clientY - pointerDownY;
+        if (!isDragging && (ddx * ddx + ddy * ddy) > DRAG_THRESHOLD * DRAG_THRESHOLD) {
+          isDragging = true;
+        }
+        if (isDragging && mouseOverCanvas) {
+          dragRevealCellAt(canvasMouseX, canvasMouseY);
+        }
+      }
+    });
+
+    container.addEventListener('mousedown', (e) => {
+      pointerDown = true;
+      pointerDownX = e.clientX;
+      pointerDownY = e.clientY;
+      isDragging = false;
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (pointerDown && !isDragging) {
+        // Click: trigger transition if over canvas
+        if (mouseOverCanvas && !transitioning) {
+          triggerTransition();
+        }
+      }
+      if (pointerDown && isDragging) {
+        finishDragReveal();
+      }
+      pointerDown = false;
+      isDragging = false;
+    });
+
+    // ===== Input: touch =====
+    let touchStartX = 0, touchStartY = 0;
+    let touchIsDragging = false;
+
+    container.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      pageMouseX = touch.clientX;
+      pageMouseY = touch.clientY;
+      touchIsDragging = false;
+      pointerDown = true;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      pageMouseX = touch.clientX;
+      pageMouseY = touch.clientY;
+      lastStimulusTime = performance.now();
+
+      const ddx = touch.clientX - touchStartX;
+      const ddy = touch.clientY - touchStartY;
+      if (!touchIsDragging && (ddx * ddx + ddy * ddy) > DRAG_THRESHOLD * DRAG_THRESHOLD) {
+        touchIsDragging = true;
+        isDragging = true;
+      }
+      if (touchIsDragging) {
+        const rect = container.getBoundingClientRect();
+        const cx = touch.clientX - rect.left;
+        const cy = touch.clientY - rect.top;
+        if (cx >= 0 && cx <= W && cy >= 0 && cy <= H) {
+          dragRevealCellAt(cx, cy);
+        }
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      if (pointerDown && !touchIsDragging) {
+        // Tap: trigger transition
+        if (mouseOverCanvas && !transitioning) {
+          triggerTransition();
+        }
+      }
+      if (touchIsDragging) {
+        finishDragReveal();
+      }
+      pointerDown = false;
+      isDragging = false;
+      touchIsDragging = false;
+    });
+
+    // ===== Input: device orientation (gyroscope / accelerometer) =====
+    function setupDeviceOrientation() {
+      window.addEventListener('deviceorientation', (e) => {
+        const gamma = e.gamma || 0; // left-right tilt
+        const beta = e.beta || 0;   // front-back tilt
+        if (prevBeta !== null) {
+          const dg = Math.abs(gamma - prevGamma);
+          const db = Math.abs(beta - prevBeta);
+          if (dg > 0.4 || db > 0.4) {
+            lastStimulusTime = performance.now();
+          }
+        }
+        // Use tilt as directional bias for refractions
+        deviceTiltX = Math.max(-1, Math.min(1, gamma / 30));
+        deviceTiltY = Math.max(-1, Math.min(1, (beta - 45) / 30));
+        prevGamma = gamma;
+        prevBeta = beta;
+      });
+    }
+
+    // iOS 13+ requires user gesture for DeviceOrientationEvent
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      document.addEventListener('click', async () => {
+        try {
+          const perm = await DeviceOrientationEvent.requestPermission();
+          if (perm === 'granted') setupDeviceOrientation();
+        } catch(e) {}
+      }, { once: true });
+    } else if (typeof DeviceOrientationEvent !== 'undefined') {
+      setupDeviceOrientation();
+    }
+
+    // ===== Activity update (global + per-cell) =====
+    function updateActivity(now) {
+      const timeSinceStimulus = now - lastStimulusTime;
+      const stimulusActive = timeSinceStimulus < ACTIVITY_GRACE;
+
+      // Global activity tracks mouse movement for seed displacement only
+      if (stimulusActive || waveCursorActive) {
+        activityLevel = Math.min(1, activityLevel + ACTIVITY_ATTACK);
+      } else {
+        activityLevel = Math.max(0, activityLevel - ACTIVITY_DECAY);
+      }
+
+      // Update virtual cursor ring position
+      const elapsed = transitioning ? now - transitionStart : 0;
+      if (transitioning) {
+        waveRadius = elapsed * WAVE_SPEED;
+        waveCursorActive = true;
+      } else {
+        waveCursorActive = false;
+      }
+
+      // Per-cell activity update
+      for (let i = 0; i < CELL_COUNT; i++) {
+        let targetActivity = 0;
+
+        // Mouse/touch proximity: cells closer to cursor get more activity
+        if (stimulusActive && mouseOverCanvas) {
+          const sdx = seeds[i].x - canvasMouseX;
+          const sdy = seeds[i].y - canvasMouseY;
+          const dist = Math.sqrt(sdx * sdx + sdy * sdy);
+          if (dist < MOUSE_REFRACT_RADIUS) {
+            const proximity = 1 - dist / MOUSE_REFRACT_RADIUS;
+            // Quadratic falloff for softer edge
+            targetActivity = Math.max(targetActivity, proximity * proximity);
+          }
+        }
+
+        // Device tilt: affects all cells uniformly (mobile)
+        if (stimulusActive && (Math.abs(deviceTiltX) > 0.05 || Math.abs(deviceTiltY) > 0.05)) {
+          const tiltMag = Math.sqrt(deviceTiltX * deviceTiltX + deviceTiltY * deviceTiltY);
+          targetActivity = Math.max(targetActivity, Math.min(1, tiltMag));
+        }
+
+        // Virtual cursor ring: proximity to the expanding ring
+        if (waveCursorActive) {
+          const cdx = seeds[i].x - waveOriginX;
+          const cdy = seeds[i].y - waveOriginY;
+          const cellDist = Math.sqrt(cdx * cdx + cdy * cdy);
+          // Distance from cell to the ring edge
+          const ringDist = Math.abs(cellDist - waveRadius);
+          if (ringDist < WAVE_RING_WIDTH) {
+            const proximity = 1 - ringDist / WAVE_RING_WIDTH;
+            // Same quadratic falloff as mouse
+            targetActivity = Math.max(targetActivity, proximity * proximity);
+          }
+        }
+
+        // Smooth toward target using critically-damped spring model
+        const current = cellActivityLevels[i];
+        const diff = targetActivity - current;
+        const rate = diff > 0 ? cellAttackRates[i] : cellDecayRates[i];
+        cellActivityVelocities[i] = cellActivityVelocities[i] * 0.85 + diff * rate * 0.8;
+        cellActivityLevels[i] = Math.max(0, Math.min(1,
+          current + cellActivityVelocities[i]));
+        if (cellActivityLevels[i] < 0.001 && Math.abs(cellActivityVelocities[i]) < 0.0005) {
+          cellActivityLevels[i] = 0;
+          cellActivityVelocities[i] = 0;
+        }
+      }
+    }
+
+    // ===== Seed displacement (mouse proximity push, scaled by activity) =====
+    function updateSeedTargets() {
+      const rect = container.getBoundingClientRect();
+      canvasMouseX = pageMouseX - rect.left;
+      canvasMouseY = pageMouseY - rect.top;
+      mouseOverCanvas = canvasMouseX >= 0 && canvasMouseX <= W && canvasMouseY >= 0 && canvasMouseY <= H;
+
+      // Device tilt direction (for refraction bias on mobile)
+      if (Math.abs(deviceTiltX) > 0.05 || Math.abs(deviceTiltY) > 0.05) {
+        dirX = deviceTiltX;
+        dirY = deviceTiltY;
+      } else {
+        // Decay direction when no tilt
+        dirX *= 0.95;
+        dirY *= 0.95;
+      }
+
+      for (let i = 0; i < baseSeeds.length; i++) {
+        const bx = baseSeeds[i].x, by = baseSeeds[i].y;
+        let tx = bx, ty = by;
+
+        // Local push when cursor is near (only when over/near canvas)
+        if (activityLevel > 0.01 && mouseOverCanvas) {
+          const dx = bx - canvasMouseX, dy = by - canvasMouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_RADIUS && dist > 0) {
+            const force = (1 - dist / MOUSE_RADIUS) * activityLevel;
+            tx += (dx / dist) * force * MOUSE_SEED_STRENGTH;
+            ty += (dy / dist) * force * MOUSE_SEED_STRENGTH;
+          }
+        }
+
+        // Virtual cursor ring pushes seeds outward (same wobble as mouse)
+        if (waveCursorActive) {
+          const cdx = bx - waveOriginX, cdy = by - waveOriginY;
+          const cellDist = Math.sqrt(cdx * cdx + cdy * cdy);
+          const ringDist = Math.abs(cellDist - waveRadius);
+          if (ringDist < MOUSE_RADIUS && cellDist > 1) {
+            const force = (1 - ringDist / MOUSE_RADIUS);
+            // Push outward from wave origin
+            tx += (cdx / cellDist) * force * MOUSE_SEED_STRENGTH * 0.6;
+            ty += (cdy / cellDist) * force * MOUSE_SEED_STRENGTH * 0.6;
+          }
+        }
+
+        targetSeeds[i].x = tx;
+        targetSeeds[i].y = ty;
+      }
+    }
+
+    function animateSeeds() {
+      let moved = false;
+      for (let i = 0; i < seeds.length; i++) {
+        const dx = targetSeeds[i].x - seeds[i].x;
+        const dy = targetSeeds[i].y - seeds[i].y;
+        if (Math.abs(dx) > 0.02 || Math.abs(dy) > 0.02) {
+          // Exponential ease-out: faster when far, very gentle near target
+          const factor = 1 - Math.pow(1 - SEED_DAMPING, 1);
+          seeds[i].x += dx * factor;
+          seeds[i].y += dy * factor;
+          moved = true;
+        } else {
+          seeds[i].x = targetSeeds[i].x;
+          seeds[i].y = targetSeeds[i].y;
+        }
+      }
+      if (moved) recomputePolys();
+    }
+
+    // ===== Drag reveal helpers =====
+    function findCellAt(cx, cy) {
+      let minDist = Infinity, closest = -1;
+      for (let i = 0; i < seeds.length; i++) {
+        const dx = seeds[i].x - cx, dy = seeds[i].y - cy;
+        const d = dx * dx + dy * dy;
+        if (d < minDist) { minDist = d; closest = i; }
+      }
+      return closest;
+    }
+
+    function dragRevealCellAt(cx, cy) {
+      const cell = findCellAt(cx, cy);
+      if (cell >= 0) {
+        cellDragReveal[cell] = Math.min(1, cellDragReveal[cell] + DRAG_FADE_SPEED);
+      }
+    }
+
+    function finishDragReveal() {
+      // If any cells were revealed, trigger wavefront transition
+      // Keep cellDragReveal values — the wavefront will continue from where drag left off
+      let hasRevealed = false;
+      for (let i = 0; i < CELL_COUNT; i++) {
+        if (cellDragReveal[i] > 0.1) { hasRevealed = true; break; }
+      }
+      if (hasRevealed && !transitioning) {
+        triggerTransition();
+      }
+    }
+
+    // ===== Transition state (V4 grow) =====
+    let transitioning = false, transitionStart;
+    let fromIdx = 0, toIdx = 0;
+    let cellFlipTimes = [];
+    let waveOriginX = 0, waveOriginY = 0;
+    // Virtual cursor ring state
+    let waveRadius = 0;  // current ring radius (px from origin)
+    let waveCursorActive = false;
+    let slideshowInterval = null;
+
+    function startSlideshow() {
+      requestAnimationFrame(mainLoop);
+      slideshowInterval = setInterval(triggerTransition, HOLD_DURATION);
+    }
+
+    function resetSlideshowTimer() {
+      if (slideshowInterval) clearInterval(slideshowInterval);
+      slideshowInterval = setInterval(triggerTransition, HOLD_DURATION);
+    }
+
+    function triggerTransition() {
+      fromIdx = currentIdx;
+      toIdx = (currentIdx + 1) % images.length;
+
+      // Start BFS from cell nearest to cursor if hovering, otherwise random
+      let startCell;
+      if (mouseOverCanvas) {
+        let minDist = Infinity;
+        startCell = 0;
+        for (let i = 0; i < seeds.length; i++) {
+          const dx = seeds[i].x - canvasMouseX;
+          const dy = seeds[i].y - canvasMouseY;
+          const d = dx * dx + dy * dy;
+          if (d < minDist) { minDist = d; startCell = i; }
+        }
+      } else {
+        startCell = Math.floor(Math.random() * CELL_COUNT);
+      }
+      // Store wave origin for directional refraction
+      waveOriginX = seeds[startCell].x;
+      waveOriginY = seeds[startCell].y;
+      cellFlipTimes = new Array(CELL_COUNT).fill(-1);
+      const queue = [startCell];
+      cellFlipTimes[startCell] = 0;
+      while (queue.length > 0) {
+        const cell = queue.shift();
+        const nextTime = cellFlipTimes[cell] + WAVE_DELAY;
+        for (const neighbor of adjacency[cell]) {
+          if (cellFlipTimes[neighbor] === -1) {
+            cellFlipTimes[neighbor] = nextTime;
+            queue.push(neighbor);
+          }
+        }
+      }
+      transitioning = true;
+      transitionStart = performance.now();
+      resetSlideshowTimer();
+    }
+
+    // ===== Main loop =====
+    function mainLoop() {
+      const now = performance.now();
+      updateActivity(now);
+      updateSeedTargets();
+      animateSeeds();
+      drawScene(now);
+      requestAnimationFrame(mainLoop);
+    }
+
+    // ===== Drawing =====
+    function drawScene(now) {
+      if (!ready) return;
+      const elapsed = transitioning ? now - transitionStart : 0;
+      const imgFrom = images[fromIdx % images.length];
+      const imgTo = images[toIdx % images.length];
+      const imgCurrent = images[currentIdx % images.length];
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Draw a seamless base image first so no background peeks through cell gaps
+      const baseImg = transitioning ? imgFrom : imgCurrent;
+      const baseParams = coverParams(baseImg, 0, 0);
+      if (baseParams) {
+        ctx.drawImage(baseImg, baseParams.dx, baseParams.dy, baseParams.dw, baseParams.dh);
+      }
+
+      // Global directional refraction bias (from device tilt only)
+      const globalBiasX = dirX * REFRACT_MAX * 0.5;
+      const globalBiasY = dirY * REFRACT_MAX * 0.5;
+
+      let allDone = true;
+
+      for (let i = 0; i < CELL_COUNT; i++) {
+        const poly = cellPolys[i];
+        if (!poly || poly.length < 3) continue;
+
+        const ref = cellRefractions[i];
+        const ca = cellActivityLevels[i]; // per-cell activity
+
+        // Per-cell mouse proximity refraction: cells near cursor get directional pull
+        let mouseRefractX = 0, mouseRefractY = 0;
+        if (mouseOverCanvas && ca > 0.001) {
+          const sdx = seeds[i].x - canvasMouseX;
+          const sdy = seeds[i].y - canvasMouseY;
+          const dist = Math.sqrt(sdx * sdx + sdy * sdy);
+          if (dist < MOUSE_REFRACT_RADIUS && dist > 1) {
+            const proximity = 1 - dist / MOUSE_REFRACT_RADIUS;
+            // Pull refraction toward mouse
+            mouseRefractX = -(sdx / dist) * proximity * REFRACT_MAX * 0.4;
+            mouseRefractY = -(sdy / dist) * proximity * REFRACT_MAX * 0.4;
+          }
+        }
+
+        // Wave directional refraction: push outward from virtual cursor ring
+        let waveRefractX = 0, waveRefractY = 0;
+        if (waveCursorActive) {
+          const cdx = seeds[i].x - waveOriginX;
+          const cdy = seeds[i].y - waveOriginY;
+          const cellDist = Math.sqrt(cdx * cdx + cdy * cdy);
+          const ringDist = Math.abs(cellDist - waveRadius);
+          if (ringDist < WAVE_RING_WIDTH && cellDist > 1) {
+            const proximity = 1 - ringDist / WAVE_RING_WIDTH;
+            // Push away from wave origin, like mouse pull but outward
+            waveRefractX = (cdx / cellDist) * proximity * REFRACT_MAX * 0.4;
+            waveRefractY = (cdy / cellDist) * proximity * REFRACT_MAX * 0.4;
+          }
+        }
+
+        // Refraction: character offset + mouse pull + wave push + tilt bias, all scaled by activity
+        const dx = (ref.dx + mouseRefractX + waveRefractX) * ca + globalBiasX * ca;
+        const dy = (ref.dy + mouseRefractY + waveRefractY) * ca + globalBiasY * ca;
+
+        if (!transitioning) {
+          // Drag reveal: blend between current and next image per cell
+          const dragT = cellDragReveal[i];
+          if (dragT > 0.001) {
+            const nextImg = images[(currentIdx + 1) % images.length];
+            ctx.save();
+            ctx.globalAlpha = 1 - dragT;
+            drawClippedImage(poly, imgCurrent, dx, dy);
+            ctx.restore();
+            ctx.save();
+            ctx.globalAlpha = dragT;
+            drawClippedImage(poly, nextImg, dx, dy);
+            ctx.restore();
+          } else {
+            ctx.save();
+            drawClippedImage(poly, imgCurrent, dx, dy);
+            ctx.restore();
+          }
+          shadeCellPoly(poly, i, ca);
+        } else {
+          const flipStart = cellFlipTimes[i];
+
+          if (flipStart === -1) {
+            // Not yet reached by BFS — show drag-blended state or from image
+            const dragT = cellDragReveal[i];
+            if (dragT > 0.001) {
+              ctx.save();
+              ctx.globalAlpha = 1 - dragT;
+              drawClippedImage(poly, imgFrom, dx, dy);
+              ctx.restore();
+              ctx.save();
+              ctx.globalAlpha = dragT;
+              drawClippedImage(poly, imgTo, dx, dy);
+              ctx.restore();
+            } else {
+              ctx.save();
+              drawClippedImage(poly, imgFrom, dx, dy);
+              ctx.restore();
+            }
+            shadeCellPoly(poly, i, ca);
+            allDone = false;
+          } else {
+            const cellElapsed = elapsed - flipStart;
+
+            if (cellElapsed < 0) {
+              // Before this cell's flip — show drag-blended state
+              const dragT = cellDragReveal[i];
+              if (dragT > 0.001) {
+                ctx.save();
+                ctx.globalAlpha = 1 - dragT;
+                drawClippedImage(poly, imgFrom, dx, dy);
+                ctx.restore();
+                ctx.save();
+                ctx.globalAlpha = dragT;
+                drawClippedImage(poly, imgTo, dx, dy);
+                ctx.restore();
+              } else {
+                ctx.save();
+                drawClippedImage(poly, imgFrom, dx, dy);
+                ctx.restore();
+              }
+              shadeCellPoly(poly, i, ca);
+              allDone = false;
+            } else if (cellElapsed >= CELL_FLIP_DURATION) {
+              ctx.save();
+              drawClippedImage(poly, imgTo, dx, dy);
+              ctx.restore();
+              shadeCellPoly(poly, i, ca);
+            } else {
+              allDone = false;
+              const progress = cellElapsed / CELL_FLIP_DURATION;
+              const eased = progress * progress * (3 - 2 * progress);
+              // Blend from drag-reveal level to fully revealed
+              const dragT = cellDragReveal[i];
+              const blendT = dragT + (1 - dragT) * eased;
+
+              ctx.save();
+              ctx.globalAlpha = 1 - blendT;
+              drawClippedImage(poly, imgFrom, dx, dy);
+              ctx.restore();
+
+              ctx.save();
+              ctx.globalAlpha = blendT;
+              drawClippedImage(poly, imgTo, dx, dy);
+              ctx.restore();
+              shadeCellPoly(poly, i, ca);
+            }
+          }
+        }
+      }
+
+      if (transitioning && allDone) {
+        currentIdx = toIdx;
+        transitioning = false;
+        // Reset drag state
+        cellDragReveal.fill(0);
+      }
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    loadImages();
+  </script>
+</body>
+</html>

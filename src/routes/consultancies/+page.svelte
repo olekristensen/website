@@ -1,5 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import SectionLabel from '$lib/components/SectionLabel.svelte';
+	import PageTitle from '$lib/components/PageTitle.svelte';
+	import DuotoneImage from '$lib/components/DuotoneImage.svelte';
 
 	let { data }: { data: PageData } = $props();
 </script>
@@ -8,55 +11,54 @@
 	<title>Consultancies — Ole Kristensen</title>
 </svelte:head>
 
-<div>
-	<section>
-		<div>
-			<p>Consultancies</p>
-			<h1>Design<br /> Technology</h1>
-			<p>For broadcasters, stages, museums and cultural institutions.</p>
+<div class="page-dark">
+	<section class="px-[var(--gutter)] py-[clamp(3rem,6vw,6rem)]">
+		<div class="mx-auto max-w-[var(--max-w)]">
+			<SectionLabel class="mb-2">{data.section?.meta.label ?? 'Consultancies'}</SectionLabel>
+			<div class="relative">
+				<img
+					src="/images/logos/den%20frie%20vilje%20logo%20knockout.svg"
+					alt="Den Frie Vilje"
+					class="float-right ml-6"
+					style="height: calc(clamp(2.5rem, 5vw, 4rem) * 1.68);"
+				/>
+				<PageTitle>{@html data.section?.meta.title ?? 'Design Technology'}</PageTitle>
+				{#if data.section?.meta.lead}
+					<p class="mt-4 max-w-[40ch] text-[0.9rem] text-[var(--color-ink-secondary)]">{data.section.meta.lead}</p>
+				{/if}
+			</div>
+			{#if data.section?.html}
+				<p class="mt-8 max-w-[55ch] font-serif text-[1.05rem] leading-relaxed text-[var(--color-ink-secondary)]">{@html data.section.html}</p>
+			{/if}
 		</div>
 	</section>
 
-	<section>
-		<div>
-			{#each data.grouped as group, gi (group.year)}
-				<div>
-					<div>
-						<span>{group.year || 'Undated'}</span>
-						<span></span>
-					</div>
-
-					<div>
-						{#each group.items as item (item.slug)}
-							<a href="/consultancies/{item.slug}">
-								{#if item.images.thumb}
-									<div>
-										<img
-											src={item.images.thumb}
-											alt={item.meta.title || item.slug}
-											loading="lazy"
-										/>
-									</div>
-								{/if}
-								<div>
-									<h3>{item.meta.title || item.slug}</h3>
-									{#if item.meta.lead}
-										<p>{item.meta.lead}</p>
-									{/if}
-									<div>
-										{#if item.meta.client}
-											<span>{item.meta.client}</span>
-										{/if}
-										{#if item.meta.date}
-											<span>{item.meta.date}</span>
-										{/if}
-									</div>
-								</div>
-							</a>
-						{/each}
-					</div>
-				</div>
-			{/each}
+	<section class="px-[var(--gutter)] pb-[clamp(5rem,10vw,10rem)]">
+		<div class="mx-auto max-w-[var(--max-w)]">
+			<div class="flex flex-col">
+				{#each data.items as item (item.slug)}
+					<a href="/consultancies/{item.slug}" class="group grid grid-cols-[3.5rem_1fr_auto] items-center gap-4 border-b border-[var(--color-border)] py-5 no-underline transition-[padding-left] duration-300 first:border-t hover:pl-2 md:grid-cols-[5rem_1fr_auto] md:gap-6">
+						{#if item.images.thumb}
+						<DuotoneImage src={item.images.thumb} class="h-10 w-14 shrink-0 overflow-hidden md:h-14 md:w-20" />
+						{/if}
+						<div>
+							<h3 class="mb-0.5 font-heading text-[1.1rem] font-medium tracking-tight">{item.meta.title || item.slug}</h3>
+							{#if item.meta.lead}
+								<p class="max-w-[40ch] text-[0.82rem] text-[var(--color-ink-secondary)]">{item.meta.lead}</p>
+							{/if}
+						</div>
+						<div class="flex shrink-0 items-center gap-6 text-[0.75rem] text-[var(--color-ink-secondary)]">
+							{#if item.meta.client}
+								<span class="hidden md:inline">{item.meta.client}</span>
+							{/if}
+							{#if item.meta.date}
+								<span>{item.meta.date}</span>
+							{/if}
+							<span class="text-[1.1rem] text-[var(--color-accent)] transition-transform duration-300 group-hover:translate-x-1">→</span>
+						</div>
+					</a>
+				{/each}
+			</div>
 		</div>
 	</section>
 </div>

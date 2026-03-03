@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import VimeoPlayer from '$lib/components/VimeoPlayer.svelte';
+	import SectionLabel from '$lib/components/SectionLabel.svelte';
+	import PageTitle from '$lib/components/PageTitle.svelte';
+	import CtaLink from '$lib/components/CtaLink.svelte';
+	import Tag from '$lib/components/Tag.svelte';
+	import Gallery from '$lib/components/Gallery.svelte';
 
 	let { data }: { data: PageData } = $props();
-	let lightboxIndex = $state(-1);
 </script>
 
 <svelte:head>
@@ -13,136 +17,92 @@
 	{/if}
 </svelte:head>
 
-<article>
-	<header>
-		<div>
-			<a href="/works">Works</a>
-			<h1>{data.item.meta.title}</h1>
-			{#if data.item.meta.lead}
-				<p>{data.item.meta.lead}</p>
+<div class="page-light">
+<article class="px-[var(--gutter)]">
+	<header class="mx-auto max-w-[var(--max-w)] py-[clamp(3rem,6vw,6rem)]">
+		<a href="/works" class="mb-6 inline-block font-heading text-[0.72rem] font-medium uppercase tracking-[0.12em] text-[var(--color-accent)] no-underline transition-[gap] hover:gap-3">← Works</a>
+		<PageTitle>{data.item.meta.title}</PageTitle>
+		{#if data.item.meta.lead}
+			<p class="mt-4 max-w-[50ch] text-[1.1rem] leading-relaxed text-[var(--color-ink-secondary)]">{data.item.meta.lead}</p>
+		{/if}
+		<div class="mt-4 flex flex-wrap items-center gap-3">
+			{#if data.item.meta.date}
+				<span class="text-[0.78rem] text-[var(--color-ink-secondary)]">{data.item.meta.date}</span>
 			{/if}
-			<div>
-				{#if data.item.meta.date}
-					<span>{data.item.meta.date}</span>
-				{/if}
-				{#if data.item.meta.tags}
-					<span></span>
-					{#each data.item.meta.tags as tag}
-						<span>{tag}</span>
-					{/each}
-				{/if}
-			</div>
+			{#if data.item.meta.tags}
+				<span class="text-[var(--color-border)]">·</span>
+				{#each data.item.meta.tags as tag}
+					<Tag>{tag}</Tag>
+				{/each}
+			{/if}
 		</div>
 	</header>
 
 	<!-- Videos -->
 	{#if data.item.meta.videos?.length}
-		<section>
-			<div>
-				<div>
-					{#each data.item.meta.videos as video}
-						<VimeoPlayer id={video.id} title={video.title} />
-					{/each}
-				</div>
+		<section class="mx-auto max-w-[var(--max-w)] pb-12">
+			<div class="grid gap-6">
+				{#each data.item.meta.videos as video}
+					<VimeoPlayer id={video.id} title={video.title} />
+				{/each}
 			</div>
 		</section>
 	{/if}
 
 	<!-- Image Gallery -->
 	{#if data.item.images.gallery.length > 0}
-		<section>
-			<div>
-				<div>
-					{#each data.item.images.gallery as src, i}
-						<button
-							type="button"
-							onclick={() => lightboxIndex = i}
-						>
-							<img
-								{src}
-								alt="{data.item.meta.title} — image {i + 1}"
-								loading="lazy"
-							/>
-						</button>
-					{/each}
-				</div>
-				{#if data.item.meta.photocredits}
-					<p>Photos: {data.item.meta.photocredits}</p>
-				{/if}
-			</div>
+		<section class="mx-auto max-w-[var(--max-w)] pb-12">
+			<Gallery images={data.item.images.gallery} title={data.item.meta.title} photocredits={data.item.meta.photocredits} />
 		</section>
 	{/if}
 
-	<!-- Lightbox -->
-	{#if lightboxIndex >= 0}
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div
-			role="dialog"
-			aria-modal="true"
-			tabindex="-1"
-			onclick={() => lightboxIndex = -1}
-			onkeydown={(e) => {
-				if (e.key === 'Escape') lightboxIndex = -1;
-				if (e.key === 'ArrowRight' && lightboxIndex < data.item.images.gallery.length - 1) lightboxIndex++;
-				if (e.key === 'ArrowLeft' && lightboxIndex > 0) lightboxIndex--;
-			}}
-		>
-			<button
-				onclick={() => lightboxIndex = -1}
-				aria-label="Close"
-			>&times;</button>
-			{#if lightboxIndex > 0}
-				<button
-					onclick={(e) => { e.stopPropagation(); lightboxIndex--; }}
-					aria-label="Previous"
-				>&lsaquo;</button>
-			{/if}
-			{#if lightboxIndex < data.item.images.gallery.length - 1}
-				<button
-					onclick={(e) => { e.stopPropagation(); lightboxIndex++; }}
-					aria-label="Next"
-				>&rsaquo;</button>
-			{/if}
-			<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-			<div onclick={(e) => e.stopPropagation()}>
-				<img
-					src={data.item.images.gallery[lightboxIndex]}
-					alt="{data.item.meta.title} — image {lightboxIndex + 1}"
-				/>
-			</div>
-			<p>{lightboxIndex + 1} / {data.item.images.gallery.length}</p>
-		</div>
-	{/if}
-
 	<!-- Content -->
-	<section>
-		<div>
-			<div>
+	<section class="mx-auto max-w-[var(--max-w)] py-12">
+		<div class="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_280px]">
+			<div class="prose">
 				{@html data.item.html}
 			</div>
 
 			{#if data.item.meta.materials || data.item.meta.partners || data.item.meta.client}
-				<aside>
-					<div>
-						{#if data.item.meta.materials}
-							<div>
-								<h4>Materials &amp; Equipment</h4>
-								<p>{data.item.meta.materials}</p>
-							</div>
-						{/if}
-						{#if data.item.meta.partners}
-							<div>
-								<h4>Partners</h4>
-								<p>{data.item.meta.partners}</p>
-							</div>
-						{/if}
-						{#if data.item.meta.client}
-							<div>
-								<h4>Client</h4>
-								<p>{data.item.meta.client}</p>
-							</div>
-						{/if}
-					</div>
+				<aside class="border-t border-[var(--color-border)] pt-6 lg:border-t-0 lg:border-l lg:pl-8 lg:pt-0">
+					       <div class="space-y-6">
+						       {#if data.item.meta.materials}
+							       <div>
+							       <SectionLabel tag="h4" class="mb-1">Materials &amp; Equipment</SectionLabel>
+							       <p class="text-[0.85rem] leading-relaxed text-[var(--color-ink-secondary)]">{data.item.meta.materials}</p>
+						       </div>
+					       {/if}
+					       {#if data.item.meta.technologies}
+					       <div>
+						   <SectionLabel tag="h4" class="mb-1">Technologies</SectionLabel>
+							   <ul class="text-[0.85rem] leading-relaxed text-[var(--color-ink-secondary)]">
+							       {#each data.item.meta.technologies as tech (tech)}
+								   <li>{tech}</li>
+							       {/each}
+							   </ul>
+						       </div>
+						       {/if}
+						       {#if data.item.meta.partners}
+							       <div>
+							       <SectionLabel tag="h4" class="mb-1">Partners</SectionLabel>
+								       <p class="text-[0.85rem] leading-relaxed text-[var(--color-ink-secondary)]">{data.item.meta.partners}</p>
+							       </div>
+						       {/if}
+						       {#if data.item.meta.client}
+							       <div>
+							       <SectionLabel tag="h4" class="mb-1">Client</SectionLabel>
+								       <p class="text-[0.85rem] leading-relaxed text-[var(--color-ink-secondary)]">{data.item.meta.client}</p>
+							       </div>
+						       {/if}
+						       {#if data.item.meta.github}
+							       <div>
+							       <SectionLabel tag="h4" class="mb-1">Source Code</SectionLabel>
+								       <p class="text-[0.85rem] leading-relaxed text-[var(--color-ink-secondary)]">
+									       <a href={`https://github.com/${data.item.meta.github.user}/${data.item.meta.github.repo}`} target="_blank" rel="noopener" class="text-[var(--color-accent)] underline">{data.item.meta.github.user}/{data.item.meta.github.repo}</a>
+								       </p>
+							       </div>
+						       {/if}
+					       </div>
 				</aside>
 			{/if}
 		</div>
@@ -150,32 +110,30 @@
 
 	<!-- Appearances -->
 	{#if data.item.meta.appearances?.length}
-		<section>
-			<div>
-				<h4>Appearances</h4>
-				<div>
-					{#each data.item.meta.appearances as appearance}
-						<a
-							href={appearance.url}
-							target="_blank"
-							rel="noopener"
-						>
-							<span>{appearance.occasion}</span>
-							<div>
-								<span>{appearance.place}</span>
-								<span>{appearance.date}</span>
-							</div>
-						</a>
-					{/each}
-				</div>
+		<section class="mx-auto max-w-[var(--max-w)] border-t border-[var(--color-border)] py-12">
+			<SectionLabel tag="h4" class="mb-6">Appearances</SectionLabel>
+			<div class="flex flex-col">
+				{#each data.item.meta.appearances as appearance}
+					<a
+						href={appearance.url}
+						target="_blank"
+						rel="noopener"
+						class="group flex items-center justify-between border-b border-[var(--color-border)] py-3 no-underline transition-[padding-left] duration-300 first:border-t hover:pl-2"
+					>
+						<span class="font-heading text-[0.9rem] font-medium text-[var(--color-ink)]">{appearance.occasion}</span>
+						<div class="flex items-center gap-4 text-[0.78rem] text-[var(--color-ink-secondary)]">
+							<span>{appearance.place}</span>
+							<span>{appearance.date}</span>
+						</div>
+					</a>
+				{/each}
 			</div>
 		</section>
 	{/if}
 
 	<!-- Back nav -->
-	<nav>
-		<div>
-			<a href="/works">&larr; All Works</a>
-		</div>
+	<nav class="mx-auto max-w-[var(--max-w)] border-t border-[var(--color-border)] py-8">
+		<CtaLink href="/works">← All Works</CtaLink>
 	</nav>
 </article>
+</div>

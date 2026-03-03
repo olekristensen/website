@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V4 — Voronoi Grow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --surface: oklch(0.98 0.003 100);
+      --ink: oklch(0.12 0.01 260);
+      --ink-secondary: oklch(0.50 0.01 260);
+      --accent: oklch(0.75 0.30 150);
+      --border: oklch(0.93 0.003 100);
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --max-w: 1280px;
+      --gutter: clamp(1.5rem, 5vw, 4rem);
+      --nav-h: 3.25rem;
+    }
+    body {
+      font-family: var(--font-body); background: var(--surface); color: var(--ink);
+      line-height: 1.6; font-weight: 300; -webkit-font-smoothing: antialiased;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: oklch(from var(--surface) l c h / 0.85);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 var(--gutter);
+      display: flex; justify-content: space-between; align-items: center;
+      height: var(--nav-h);
+    }
+    .nav-brand {
+      font-family: var(--font-heading); font-size: 1rem; font-weight: 500;
+      color: var(--ink); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 1.75rem; list-style: none; }
+    .nav-links a { color: var(--ink-secondary); text-decoration: none; font-family: var(--font-heading); font-size: 0.78rem; font-weight: 400; letter-spacing: 0.03em; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+
+    .hero {
+      min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+      align-items: end; padding: 0 var(--gutter); padding-top: var(--nav-h);
+      max-width: var(--max-w); margin: 0 auto; gap: 2rem;
+    }
+    .hero-text { padding-bottom: clamp(4rem, 10vh, 8rem); }
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(3rem, 8vw, 6rem); font-weight: 700;
+      line-height: 0.92; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+    }
+    .hero-sub { font-size: 1rem; line-height: 1.7; color: var(--ink-secondary); max-width: 35ch; margin-bottom: 1.5rem; }
+    .hero-accent-bar { width: 4rem; height: 3px; background: var(--accent); margin-bottom: 1rem; }
+    .hero-location { font-family: var(--font-heading); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-secondary); }
+
+    .hero-voronoi {
+      position: relative;
+      align-self: stretch;
+      display: flex; align-items: flex-end;
+      padding-bottom: clamp(4rem, 10vh, 8rem);
+    }
+    .hero-voronoi canvas {
+      width: 100%; height: 100%;
+      position: absolute; inset: 0;
+    }
+
+    .design-label {
+      position: fixed; top: 5rem; left: var(--gutter); z-index: 99;
+      font-family: var(--font-heading); font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--ink-secondary); opacity: 0.5; font-weight: 500;
+    }
+    .section { padding: clamp(5rem, 10vw, 10rem) var(--gutter); }
+    .section-inner { max-width: var(--max-w); margin: 0 auto; }
+    footer { border-top: 1px solid var(--border); padding: 2.5rem var(--gutter); }
+    .footer-inner { max-width: var(--max-w); margin: 0 auto; display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ink-secondary); }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-voronoi { min-height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="design-label">V4 — Voronoi Grow: new image spawns from a seed point and grows outward, consuming cells as it expands</div>
+
+  <nav><div class="nav-inner">
+    <a href="#" class="nav-brand">Ole Kristensen</a>
+    <ul class="nav-links">
+      <li><a href="#">Works</a></li><li><a href="#">Consultancies</a></li>
+      <li><a href="#">About</a></li><li><a href="#">Contact</a></li>
+    </ul>
+  </div></nav>
+
+  <section class="hero" id="hero">
+    <div class="hero-text">
+      <h1>Ole<br>Kristensen</h1>
+      <div class="hero-accent-bar"></div>
+      <p class="hero-sub">Software artist &amp; design technologist — interactive installations, live performances and bespoke systems.</p>
+      <p class="hero-location">Copenhagen, DK</p>
+    </div>
+    <div class="hero-voronoi">
+      <canvas id="voronoi"></canvas>
+    </div>
+  </section>
+
+  <section class="section"><div class="section-inner">
+    <p style="color: var(--ink-secondary); font-size: 0.9rem;">↑ Voronoi Grow — a new image spawns from a random seed cell and spreads outward cell-by-cell, like crystallization or ink spreading. Each cell flips individually as the wavefront passes. Organic, purposeful, almost biological.</p>
+  </div></section>
+
+  <footer><div class="footer-inner"><p>&copy; 2026 Ole Kristensen</p></div></footer>
+
+  <script>
+    /*
+     * V4 — VORONOI GROW
+     *
+     * The current image fills all cells. On transition, one random
+     * seed cell "flips" to the new image, then adjacent cells flip
+     * in sequence — like a crystallization wavefront spreading
+     * across the tessellation. Each cell does a quick individual
+     * cross-dissolve as the wavefront reaches it.
+     *
+     * The growth follows the Voronoi adjacency graph, so it looks
+     * organic and connected rather than random.
+     */
+
+    const WORKS = [
+      'body-navigation', 'digital-weather', 'frost', 'fuck-you-buddy',
+      'getting-back-in-the-whole', 'inland', 'living-room', 'longing-fast-forward',
+      'malpais', 'multiplicity', 'oresund', 'stereo', 'stereograhpy-workshop',
+      'stop-motion', 'timemap-3', 'trae', 'work-in-progress'
+    ];
+
+    const CELL_COUNT = 28;
+    const CELL_FLIP_DURATION = 400;   // each cell's individual dissolve
+    const WAVE_DELAY = 120;           // delay between wavefront steps
+    const HOLD_DURATION = 4500;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    const canvas = document.getElementById('voronoi');
+    const ctx = canvas.getContext('2d');
+    let W, H, seeds, cellPolys, adjacency;
+    let currentIdx = 0, images = [], ready = false;
+
+    function loadImages() {
+      let loaded = 0;
+      WORKS.forEach((slug, i) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const size = DPR > 1 ? 1920 : 960;
+        img.src = `/content/works/${slug}/thumb-${size}.jpg`;
+        img.onload = () => { loaded++; if (loaded === WORKS.length) { ready = true; startSlideshow(); } };
+        img.onerror = () => { loaded++; if (loaded === WORKS.length) { ready = true; startSlideshow(); } };
+        images[i] = img;
+      });
+    }
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = W * DPR;
+      canvas.height = H * DPR;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      generateSeeds();
+      computePolys();
+      computeAdjacency();
+      if (ready) drawStatic(currentIdx);
+    }
+
+    function generateSeeds() {
+      let rng = 77;
+      const rand = () => { rng = (rng * 16807) % 2147483647; return rng / 2147483647; };
+      seeds = [];
+      for (let i = 0; i < CELL_COUNT; i++) {
+        seeds.push({ x: rand() * W, y: rand() * H });
+      }
+      for (let iter = 0; iter < 4; iter++) {
+        const regions = seeds.map(() => ({ sx: 0, sy: 0, count: 0 }));
+        const step = 3;
+        for (let y = 0; y < H; y += step) {
+          for (let x = 0; x < W; x += step) {
+            let minD = Infinity, minI = 0;
+            for (let i = 0; i < seeds.length; i++) {
+              const dx = x - seeds[i].x, dy = y - seeds[i].y;
+              const d = dx * dx + dy * dy;
+              if (d < minD) { minD = d; minI = i; }
+            }
+            regions[minI].sx += x;
+            regions[minI].sy += y;
+            regions[minI].count++;
+          }
+        }
+        for (let i = 0; i < seeds.length; i++) {
+          if (regions[i].count > 0) {
+            seeds[i].x = regions[i].sx / regions[i].count;
+            seeds[i].y = regions[i].sy / regions[i].count;
+          }
+        }
+      }
+    }
+
+    function clipPolygon(poly, px, py, nx, ny) {
+      const out = [];
+      for (let i = 0; i < poly.length; i++) {
+        const a = poly[i], b = poly[(i + 1) % poly.length];
+        const da = (a.x - px) * nx + (a.y - py) * ny;
+        const db = (b.x - px) * nx + (b.y - py) * ny;
+        if (da <= 0) out.push(a);
+        if ((da <= 0) !== (db <= 0)) {
+          const t = da / (da - db);
+          out.push({ x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) });
+        }
+      }
+      return out;
+    }
+
+    function computePolys() {
+      cellPolys = [];
+      for (let i = 0; i < seeds.length; i++) {
+        let poly = [
+          { x: -10, y: -10 }, { x: W + 10, y: -10 },
+          { x: W + 10, y: H + 10 }, { x: -10, y: H + 10 }
+        ];
+        for (let j = 0; j < seeds.length; j++) {
+          if (j === i) continue;
+          const mx = (seeds[i].x + seeds[j].x) / 2, my = (seeds[i].y + seeds[j].y) / 2;
+          const dx = seeds[j].x - seeds[i].x, dy = seeds[j].y - seeds[i].y;
+          poly = clipPolygon(poly, mx, my, dx, dy);
+          if (poly.length === 0) break;
+        }
+        cellPolys[i] = poly;
+      }
+    }
+
+    function computeAdjacency() {
+      // Two cells are adjacent if they share a Voronoi edge
+      // Approximate: two cells are neighbors if their seeds are close
+      // enough relative to the tessellation
+      adjacency = seeds.map(() => []);
+
+      // Sample pixels to find neighboring regions
+      const step = 4;
+      const grid = {};
+      for (let y = 0; y < H; y += step) {
+        for (let x = 0; x < W; x += step) {
+          let minD = Infinity, minI = 0;
+          for (let i = 0; i < seeds.length; i++) {
+            const dx = x - seeds[i].x, dy = y - seeds[i].y;
+            const d = dx * dx + dy * dy;
+            if (d < minD) { minD = d; minI = i; }
+          }
+          const gx = Math.floor(x / step), gy = Math.floor(y / step);
+          grid[`${gx},${gy}`] = minI;
+        }
+      }
+
+      const pairs = new Set();
+      for (let y = 0; y < H; y += step) {
+        for (let x = 0; x < W; x += step) {
+          const gx = Math.floor(x / step), gy = Math.floor(y / step);
+          const cell = grid[`${gx},${gy}`];
+          // Check right and down neighbors
+          for (const [dx, dy] of [[1, 0], [0, 1]]) {
+            const key = `${gx + dx},${gy + dy}`;
+            if (key in grid && grid[key] !== cell) {
+              const a = Math.min(cell, grid[key]);
+              const b = Math.max(cell, grid[key]);
+              const pairKey = `${a}-${b}`;
+              if (!pairs.has(pairKey)) {
+                pairs.add(pairKey);
+                adjacency[a].push(b);
+                adjacency[b].push(a);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function coverParams(img) {
+      if (!img || !img.complete || img.naturalWidth === 0) return null;
+      const imgAspect = img.naturalWidth / img.naturalHeight;
+      const canvasAspect = W / H;
+      let dw, dh, dx, dy;
+      if (imgAspect > canvasAspect) {
+        dh = H; dw = H * imgAspect; dx = (W - dw) / 2; dy = 0;
+      } else {
+        dw = W; dh = W / imgAspect; dx = 0; dy = (H - dh) / 2;
+      }
+      return { dx, dy, dw, dh };
+    }
+
+    function drawClippedImage(poly, img) {
+      const params = coverParams(img);
+      if (!params || poly.length < 3) return;
+      ctx.beginPath();
+      ctx.moveTo(poly[0].x, poly[0].y);
+      for (let j = 1; j < poly.length; j++) ctx.lineTo(poly[j].x, poly[j].y);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(img, params.dx, params.dy, params.dw, params.dh);
+    }
+
+    function drawBorders() {
+      ctx.globalAlpha = 0.06;
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < cellPolys.length; i++) {
+        const poly = cellPolys[i];
+        if (!poly || poly.length < 3) continue;
+        ctx.beginPath();
+        ctx.moveTo(poly[0].x, poly[0].y);
+        for (let j = 1; j < poly.length; j++) ctx.lineTo(poly[j].x, poly[j].y);
+        ctx.closePath();
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function drawStatic(idx) {
+      const img = images[idx % images.length];
+      const params = coverParams(img);
+      if (!params) return;
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < cellPolys.length; i++) {
+        const poly = cellPolys[i];
+        if (!poly || poly.length < 3) continue;
+        ctx.save();
+        ctx.globalAlpha = 1;
+        drawClippedImage(poly, img);
+        ctx.restore();
+      }
+      drawBorders();
+    }
+
+    // Transition state
+    let transitioning = false, transitionStart;
+    let fromIdx = 0, toIdx = 0;
+    let cellFlipTimes = []; // when each cell starts its flip
+
+    function startSlideshow() {
+      drawStatic(currentIdx);
+      setInterval(triggerTransition, HOLD_DURATION);
+    }
+
+    function triggerTransition() {
+      fromIdx = currentIdx;
+      toIdx = (currentIdx + 1) % images.length;
+
+      // BFS from a random seed cell
+      const startCell = Math.floor(Math.random() * CELL_COUNT);
+      cellFlipTimes = new Array(CELL_COUNT).fill(-1);
+      const queue = [startCell];
+      cellFlipTimes[startCell] = 0;
+      let maxWave = 0;
+
+      while (queue.length > 0) {
+        const cell = queue.shift();
+        const nextTime = cellFlipTimes[cell] + WAVE_DELAY;
+        for (const neighbor of adjacency[cell]) {
+          if (cellFlipTimes[neighbor] === -1) {
+            cellFlipTimes[neighbor] = nextTime;
+            if (nextTime > maxWave) maxWave = nextTime;
+            queue.push(neighbor);
+          }
+        }
+      }
+
+      transitioning = true;
+      transitionStart = performance.now();
+      animateGrow();
+    }
+
+    function animateGrow() {
+      if (!transitioning) return;
+      const elapsed = performance.now() - transitionStart;
+      const imgFrom = images[fromIdx % images.length];
+      const imgTo = images[toIdx % images.length];
+
+      ctx.clearRect(0, 0, W, H);
+
+      let allDone = true;
+      for (let i = 0; i < CELL_COUNT; i++) {
+        const poly = cellPolys[i];
+        if (!poly || poly.length < 3) continue;
+
+        const flipStart = cellFlipTimes[i];
+        if (flipStart === -1) {
+          // Unreachable cell — draw old image
+          ctx.save();
+          ctx.globalAlpha = 1;
+          drawClippedImage(poly, imgFrom);
+          ctx.restore();
+          continue;
+        }
+
+        const cellElapsed = elapsed - flipStart;
+
+        if (cellElapsed < 0) {
+          // Not reached yet
+          ctx.save();
+          ctx.globalAlpha = 1;
+          drawClippedImage(poly, imgFrom);
+          ctx.restore();
+          allDone = false;
+        } else if (cellElapsed >= CELL_FLIP_DURATION) {
+          // Fully flipped
+          ctx.save();
+          ctx.globalAlpha = 1;
+          drawClippedImage(poly, imgTo);
+          ctx.restore();
+        } else {
+          // Mid-flip
+          allDone = false;
+          const progress = cellElapsed / CELL_FLIP_DURATION;
+          const eased = progress * progress * (3 - 2 * progress);
+
+          ctx.save();
+          ctx.globalAlpha = 1 - eased;
+          drawClippedImage(poly, imgFrom);
+          ctx.restore();
+
+          ctx.save();
+          ctx.globalAlpha = eased;
+          drawClippedImage(poly, imgTo);
+          ctx.restore();
+        }
+      }
+
+      drawBorders();
+
+      if (allDone) {
+        currentIdx = toIdx;
+        transitioning = false;
+      } else {
+        requestAnimationFrame(animateGrow);
+      }
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    loadImages();
+  </script>
+</body>
+</html>

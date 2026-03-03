@@ -1,9 +1,12 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import VimeoPlayer from '$lib/components/VimeoPlayer.svelte';
+	import SectionLabel from '$lib/components/SectionLabel.svelte';
+	import PageTitle from '$lib/components/PageTitle.svelte';
+	import CtaLink from '$lib/components/CtaLink.svelte';
+	import Gallery from '$lib/components/Gallery.svelte';
 
 	let { data }: { data: PageData } = $props();
-	let lightboxIndex = $state(-1);
 </script>
 
 <svelte:head>
@@ -13,120 +16,59 @@
 	{/if}
 </svelte:head>
 
-<div>
-	<article>
-		<header>
-			<div>
-				<a href="/consultancies">Consultancies</a>
-				<h1>{data.item.meta.title}</h1>
-				<div>
-					{#if data.item.meta.client}
-						<span>{data.item.meta.client}</span>
-					{/if}
-					{#if data.item.meta.date}
-						<span>{data.item.meta.date}</span>
-					{/if}
-				</div>
+<div class="page-dark">
+	<article class="px-[var(--gutter)]">
+		<header class="mx-auto max-w-[var(--max-w)] py-[clamp(3rem,6vw,6rem)]">
+			<a href="/consultancies" class="mb-6 inline-block font-heading text-[0.72rem] font-medium uppercase tracking-[0.12em] text-[var(--color-accent)] no-underline transition-[gap] hover:gap-3">← Consultancies</a>
+			<PageTitle>{data.item.meta.title}</PageTitle>
+			<div class="mt-4 flex flex-wrap items-center gap-3 text-[0.78rem] text-[var(--color-ink-secondary)]">
+				{#if data.item.meta.client}
+					<span>{data.item.meta.client}</span>
+				{/if}
+				{#if data.item.meta.date}
+					<span class="text-[var(--color-border)]">·</span>
+					<span>{data.item.meta.date}</span>
+				{/if}
 			</div>
 		</header>
 
 		<!-- Videos -->
 		{#if data.item.meta.videos?.length}
-			<section>
-				<div>
-					<div>
-						{#each data.item.meta.videos as video}
-							<VimeoPlayer id={video.id} title={video.title} />
-						{/each}
-					</div>
+			<section class="mx-auto max-w-[var(--max-w)] pb-12">
+				<div class="grid gap-6">
+					{#each data.item.meta.videos as video}
+						<VimeoPlayer id={video.id} title={video.title} />
+					{/each}
 				</div>
 			</section>
 		{/if}
 
 		<!-- Image Gallery -->
 		{#if data.item.images.gallery.length > 0}
-			<section>
-				<div>
-					<div>
-						{#each data.item.images.gallery as src, i}
-							<button
-								type="button"
-								onclick={() => lightboxIndex = i}
-							>
-								<img
-									{src}
-									alt="{data.item.meta.title} — image {i + 1}"
-									loading="lazy"
-								/>
-							</button>
-						{/each}
-					</div>
-				</div>
+			<section class="mx-auto max-w-[var(--max-w)] pb-12">
+				<Gallery images={data.item.images.gallery} title={data.item.meta.title} />
 			</section>
 		{/if}
 
-		<!-- Lightbox -->
-		{#if lightboxIndex >= 0}
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div
-				role="dialog"
-				aria-modal="true"
-				tabindex="-1"
-				onclick={() => lightboxIndex = -1}
-				onkeydown={(e) => {
-					if (e.key === 'Escape') lightboxIndex = -1;
-					if (e.key === 'ArrowRight' && lightboxIndex < data.item.images.gallery.length - 1) lightboxIndex++;
-					if (e.key === 'ArrowLeft' && lightboxIndex > 0) lightboxIndex--;
-				}}
-			>
-				<button
-					onclick={() => lightboxIndex = -1}
-					aria-label="Close"
-				>&times;</button>
-				{#if lightboxIndex > 0}
-					<button
-						onclick={(e) => { e.stopPropagation(); lightboxIndex--; }}
-						aria-label="Previous"
-					>&lsaquo;</button>
-				{/if}
-				{#if lightboxIndex < data.item.images.gallery.length - 1}
-					<button
-						onclick={(e) => { e.stopPropagation(); lightboxIndex++; }}
-						aria-label="Next"
-					>&rsaquo;</button>
-				{/if}
-				<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-				<div onclick={(e) => e.stopPropagation()}>
-					<img
-						src={data.item.images.gallery[lightboxIndex]}
-						alt="{data.item.meta.title} — image {lightboxIndex + 1}"
-					/>
-				</div>
-				<p>{lightboxIndex + 1} / {data.item.images.gallery.length}</p>
-			</div>
-		{/if}
-
 		<!-- Content -->
-		<section>
-			<div>
-				<div>
+		<section class="mx-auto max-w-[var(--max-w)] py-12">
+			<div class="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_280px]">
+				<div class="prose">
 					{@html data.item.html}
 				</div>
 
 				{#if data.item.meta.client}
-					<aside>
-						<h4>Client</h4>
-						<p>{data.item.meta.client}</p>
+					<aside class="border-t border-[var(--color-border)] pt-6 lg:border-t-0 lg:border-l lg:pl-8 lg:pt-0">
+						<SectionLabel tag="h4" class="mb-1">Client</SectionLabel>
+						<p class="text-[0.85rem] leading-relaxed text-[var(--color-ink-secondary)]">{data.item.meta.client}</p>
 					</aside>
 				{/if}
 			</div>
 		</section>
 
 		<!-- Back nav -->
-		<nav>
-			<div>
-				<a href="/consultancies">&larr; All Consultancies</a>
-			</div>
+		<nav class="mx-auto max-w-[var(--max-w)] border-t border-[var(--color-border)] py-8">
+			<CtaLink href="/consultancies">← All Consultancies</CtaLink>
 		</nav>
 	</article>
 </div>

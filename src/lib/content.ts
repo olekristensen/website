@@ -13,6 +13,7 @@ export interface ContentMeta {
   client?: string;
   github?: Record<string, string>;
   photocredits?: string;
+  technologies?: string[];
   appearances?: Array<{ date: string; occasion: string; place: string; url: string }>;
   videos?: Array<{ id: string; title: string }>;
   [key: string]: any;

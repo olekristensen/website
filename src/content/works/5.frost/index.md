@@ -10,6 +10,13 @@ tags:
   - Interactive
   - Set Design
   - OpenFrameworks
+technologies:
+  - OpenFrameworks
+  - Infrared Tracking
+  - Projection Mapping
+  - Arduino
+  - Cocoa
+  - LED Lighting
 materials: Infrared camera, videoprojector, bespoke software
 partners: Jonas Jongejan, Tina Tarpgaard
 client: Recoil Performance Group & Danish Dance Theatre
@@ -39,5 +46,7 @@ videos:
 We created a universe of frozen bodies, melting ice and dripping waters. The scenography is constituted by video projections in concert with Andreas Buhl‘s lighting design, using led based light sources to accomodate the intricacies of infrared tracking. In some scenes both light and projections are mapped to the tracked positions of the dancers.
 
 Frost was from the outset designed to be tour-friendly and as such our software has to be flexible and easily adjustable for different stage dimensions.
+
+## Software
 
 The software for Frost intergrates [openFrameworks](http://openframeworks.cc) into a cocoa-based Mac OS X Snow Leopard application, running on a mac pro, seeing the dancers through three Point Grey Flea 2 IEEE 1394b cameras, showing the openGL graphics using a single video projector with a 0.7 wide angle optics and qued from qLab using apple’s midi networking capabilities.

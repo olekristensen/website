@@ -1,98 +1,155 @@
 <script lang="ts">
 	import Hero from '$lib/components/Hero.svelte';
+	import SectionLabel from '$lib/components/SectionLabel.svelte';
+	import CtaLink from '$lib/components/CtaLink.svelte';
+	import DuotoneImage from '$lib/components/DuotoneImage.svelte';
 	import type { PageData } from './$types';
+	import { getContext } from 'svelte';
 
 	let { data }: { data: PageData } = $props();
+	const getBureau = getContext<() => boolean>('bureau');
+	let bureau = $derived(getBureau ? getBureau() : false);
+
+	// Shuffle hero images client-side so each visit shows a different starting image
+	const heroImages = [...data.heroImages].sort(() => Math.random() - 0.5);
 </script>
 
 <svelte:head>
 	<title>Ole Kristensen — Software Artist & Design Technologist</title>
-	<meta name="description" content="Interactive installations, live performances and design technology for broadcasters, stages and cultural institutions." />
+	<meta name="description" content="Interactive installations, live performances and design technology." />
 </svelte:head>
 
-<Hero />
+<Hero images={heroImages} />
 
+{#snippet worksSection()}
 <!-- Works -->
-<section>
-	<div>
-		<p>Selected Works</p>
-		<h2>Projects &amp; Installations</h2>
-
-		<div>
-			{#each data.featured as work, i (work.slug)}
-				<a href="/works/{work.slug}">
-					{#if work.images.thumb}
-						<div>
-							<img
-								src={work.images.thumb}
-								alt={work.meta.title}
-								loading="lazy"
-							/>
-						</div>
-					{/if}
-					<div>
-						<h3>{work.meta.title}</h3>
-						{#if work.meta.date}
-							<span>{work.meta.date}</span>
-						{/if}
-					</div>
-					{#if work.meta.lead && i === 0}
-						<p>{work.meta.lead}</p>
-					{/if}
-				</a>
-			{/each}
+<section class="px-[var(--gutter)] py-[clamp(5rem,10vw,10rem)]">
+	<div class="animate-fade-up mx-auto max-w-[var(--max-w)]">
+		<div class="mb-[clamp(2rem,4vw,4rem)] flex flex-col items-start justify-between gap-4 border-b border-[var(--color-border)] pb-6 md:flex-row md:items-end">
+			<div>
+				<SectionLabel class="mb-2">{data.worksSection?.meta.teaser_label ?? 'Selected Works'}</SectionLabel>
+				<h2 class="font-heading text-[clamp(2rem,4vw,3.5rem)] font-semibold leading-none tracking-tight">{@html data.worksSection?.meta.title ?? 'Projects &amp; Installations'}</h2>
+			</div>
+			<p class="text-[0.9rem] text-[var(--color-ink-secondary)] md:max-w-[35ch] md:text-right">{data.worksSection?.meta.teaser_lead ?? 'Interactive installations, live performances, and commissioned work.'}</p>
 		</div>
 
-		<div>
-			<a href="/works">View all works</a>
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-[1.3fr_0.7fr]">
+			{#each data.featured as work, i (work.slug)}
+				{#if i === 0}
+					<a href="/works/{work.slug}" class="group block no-underline">
+						{#if work.images.thumb}
+							<div class="mb-4 aspect-[16/10] overflow-hidden bg-[var(--color-accent-subtle)]">
+								<img
+									src={work.images.thumb}
+									alt={work.meta.title}
+									loading="lazy"
+									class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+								/>
+							</div>
+						{/if}
+						<h3 class="mb-1 font-heading text-[1.1rem] font-medium tracking-tight">{work.meta.title}</h3>
+						{#if work.meta.date}
+							<span class="text-[0.75rem] text-[var(--color-ink-secondary)]">{work.meta.date}</span>
+						{/if}
+						{#if work.meta.lead}
+							<p class="mt-1.5 max-w-[45ch] text-[0.85rem] text-[var(--color-ink-secondary)]">{work.meta.lead}</p>
+						{/if}
+					</a>
+				{/if}
+			{/each}
+
+			<div class="flex flex-col gap-6">
+				{#each data.featured.slice(1, 3) as work (work.slug)}
+					<a href="/works/{work.slug}" class="group block no-underline">
+						{#if work.images.thumb}
+							<div class="mb-4 aspect-[4/3] overflow-hidden bg-[var(--color-accent-subtle)]">
+								<img
+									src={work.images.thumb}
+									alt={work.meta.title}
+									loading="lazy"
+									class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+								/>
+							</div>
+						{/if}
+						<h3 class="mb-1 font-heading text-[1.1rem] font-medium tracking-tight">{work.meta.title}</h3>
+						{#if work.meta.date}
+							<span class="text-[0.75rem] text-[var(--color-ink-secondary)]">{work.meta.date}</span>
+						{/if}
+					</a>
+				{/each}
+			</div>
+		</div>
+
+		<div class="mt-12">
+			<CtaLink href="/works">View all works →</CtaLink>
 		</div>
 	</div>
 </section>
+{/snippet}
 
+{#snippet consultanciesSection()}
 <!-- Consultancies -->
-<section>
-	<div>
-		<p>Consultancies</p>
-		<h2>Design Technology</h2>
+<section class="px-[var(--gutter)] py-[clamp(5rem,10vw,10rem)]">
+	<div class="animate-fade-up mx-auto max-w-[var(--max-w)]">
+		<div class="mb-[clamp(2rem,4vw,4rem)] flex flex-col items-start justify-between gap-4 border-b border-[var(--color-border)] pb-6 md:flex-row md:items-end">
+			<div>
+				<SectionLabel class="mb-2">{data.consultanciesSection?.meta.label ?? 'Consultancies'}</SectionLabel>
+				<h2 class="font-heading text-[clamp(2rem,4vw,3.5rem)] font-semibold leading-none tracking-tight">{@html data.consultanciesSection?.meta.title ?? 'Design Technology'}</h2>
+			</div>
+			<p class="text-[0.9rem] text-[var(--color-ink-secondary)] md:max-w-[35ch] md:text-right">{data.consultanciesSection?.meta.lead ?? ''}</p>
+		</div>
 
-		<div>
+		<div class="flex flex-col">
 			{#each data.consultancies.slice(0, 4) as consultancy (consultancy.slug)}
-				<a href="/consultancies/{consultancy.slug}">
+				<a href="/consultancies/{consultancy.slug}" class="group grid grid-cols-[1fr_auto] items-center gap-6 border-b border-[var(--color-border)] px-0 py-5 no-underline transition-[padding-left] duration-300 first:border-t hover:pl-2 md:grid-cols-[5rem_1fr_auto]">
+					{#if consultancy.images?.thumb}
+					<DuotoneImage src={consultancy.images.thumb} class="hidden h-14 w-20 shrink-0 overflow-hidden md:block" />
+					{/if}
 					<div>
-						<h3>{consultancy.meta.title}</h3>
+						<h3 class="mb-0.5 font-heading text-[1.1rem] font-medium tracking-tight">{consultancy.meta.title}</h3>
 						{#if consultancy.meta.lead}
-							<p>{consultancy.meta.lead}</p>
+							<p class="max-w-[40ch] text-[0.82rem] text-[var(--color-ink-secondary)]">{consultancy.meta.lead}</p>
 						{/if}
 					</div>
-					<div>
+					<div class="flex shrink-0 items-center gap-6 text-[0.75rem] text-[var(--color-ink-secondary)]">
 						{#if consultancy.meta.client}
 							<span>{consultancy.meta.client}</span>
 						{/if}
 						{#if consultancy.meta.date}
 							<span>{consultancy.meta.date}</span>
 						{/if}
-						<span>&rarr;</span>
+						<span class="text-[1.1rem] text-[var(--color-accent)] transition-transform duration-300 group-hover:translate-x-1">→</span>
 					</div>
 				</a>
 			{/each}
 		</div>
 
-		<div>
-			<a href="/consultancies">View all consultancies</a>
+		<div class="mt-12">
+			<CtaLink href="/consultancies">View all consultancies →</CtaLink>
 		</div>
 	</div>
 </section>
+{/snippet}
+
+{#if bureau}
+	{@render consultanciesSection()}
+	{@render worksSection()}
+{:else}
+	{@render worksSection()}
+	{@render consultanciesSection()}
+{/if}
 
 <!-- About -->
-<section>
-	<div>
-		<div>
-			<p>About</p>
-			<p>
-				Ole Kristensen is a visual artist, programmer and scenographer — developing and appropriating new technology, creating works with software at the core.
-			</p>
+<section class="px-[var(--gutter)] py-[clamp(5rem,10vw,10rem)]">
+	<div class="animate-fade-up mx-auto max-w-[var(--max-w)]">
+		<SectionLabel class="mb-4">About</SectionLabel>
+		<div class="grid grid-cols-1 items-start gap-8 md:grid-cols-[3px_1fr]">
+			<div class="hidden h-full min-h-16 bg-[var(--color-accent)] md:block"></div>
 			<div>
-				<a href="/about">Read more</a>
+				<p class="max-w-[45ch] text-[clamp(1.1rem,2vw,1.4rem)] leading-relaxed text-[var(--color-ink)]">
+					{data.aboutSection?.meta.teaser ?? 'Ole Kristensen is a visual artist, programmer and scenographer — developing and appropriating new technology, creating works with software at the core.'}
+				</p>
+				<CtaLink href="/about" class="mt-8">Read more →</CtaLink>
 			</div>
 		</div>
 	</div>

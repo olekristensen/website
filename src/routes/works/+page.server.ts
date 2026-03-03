@@ -1,4 +1,4 @@
-import { getContentList } from '$lib/content';
+import { getContentList, getContent } from '$lib/content';
 import type { PageServerLoad } from './$types';
 
 function extractYear(date?: string): number {
@@ -9,6 +9,7 @@ function extractYear(date?: string): number {
 
 export const load: PageServerLoad = async () => {
 	const items = await getContentList('works');
+	const section = await getContent('works', '');
 
 	// Sort newest first
 	items.sort((a, b) => extractYear(b.meta.date) - extractYear(a.meta.date));
@@ -27,6 +28,7 @@ export const load: PageServerLoad = async () => {
 
 	return {
 		grouped,
+		section,
 		title: 'Works'
 	};
 };

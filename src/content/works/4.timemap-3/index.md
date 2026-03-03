@@ -9,6 +9,13 @@ tags:
   - Interactive
   - Set Design
   - OpenFrameworks
+technologies:
+  - OpenFrameworks
+  - Infrared Tracking
+  - Projection Mapping
+  - MIDI
+  - OSC
+  - Cocoa
 materials: Infrared camera, videoprojectors, custom software
 partners: Jonas Jongejan, Tina Tarpgaard
 client: Recoil Performance Group
@@ -40,4 +47,8 @@ Being placed in past, present and future their stories are portrayed visually, p
 
 They meet in the court room in a battle with words – from taking orders to making them fly across the screens.
 
+## Technical Approach
+
 Ole Kristensen and Jonas Jongejan created the videoscenography using infrared motion tracking implemented in [openFrameworks](http://openframeworks.cc). All video and lights were cued from qLab using midi to Isadora through to a GrandMA node, our own custom OSC server, openGL renderer and scene and text editor. During the performance all text was typed live by the author Gritt Uldall on stage. The choreographer had control over some of the scenes from her own laptop. Some parts of the first act were filmed and edited on stage during second act for an epilogue shown in the lobby.
+
+The source code is built on ofxCocoaPlugins, a custom Objective-C wrapper for [openFrameworks](http://openframeworks.cc) that integrates MIDI and OSC-addressable infrared tracking, projection mapping and Cocoa UI into a single Mac OS X application.

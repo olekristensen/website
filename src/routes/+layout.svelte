@@ -2,14 +2,25 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import type { Snippet } from 'svelte';
+	import { setContext } from 'svelte';
 	import '../app.css';
 
 	let { children }: { children: Snippet } = $props();
+	let bureau = $state(false);
+
+	setContext('bureau', () => bureau);
+
+	function handleToggleDomain(mode: 'artist' | 'bureau') {
+		bureau = mode === 'bureau';
+		if (typeof document !== 'undefined') {
+			document.body.classList.toggle('bureau', bureau);
+		}
+	}
 </script>
 
-<div>
-	<Header />
-	<main>
+<div class="min-h-screen flex flex-col">
+	<Header {bureau} onToggleDomain={handleToggleDomain} />
+	<main class="flex-1 pt-[var(--nav-h)]">
 		{@render children()}
 	</main>
 	<Footer />

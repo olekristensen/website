@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Serif Body Text — Options A / B / C</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --surface: oklch(0.98 0.003 100);
+      --ink: oklch(0.12 0.01 260);
+      --ink-secondary: oklch(0.50 0.01 260);
+      --accent: oklch(0.75 0.30 150);
+      --accent-hover: oklch(0.70 0.35 150);
+      --accent-subtle: oklch(0.95 0.06 150);
+      --border: oklch(0.93 0.003 100);
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-serif: 'Source Serif 4', serif;
+      --max-w: 1280px;
+      --gutter: clamp(1.5rem, 5vw, 4rem);
+      --nav-h: 3.25rem;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--surface);
+      color: var(--ink);
+      line-height: 1.6;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== Nav ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: oklch(from var(--surface) l c h / 0.85);
+      backdrop-filter: blur(16px);
+      padding: 0 var(--gutter);
+    }
+    nav .inner {
+      max-width: var(--max-w); margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: var(--nav-h);
+    }
+    nav a { font-family: var(--font-heading); font-size: 1rem; font-weight: 500; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+    nav .links { display: flex; gap: 1.5rem; }
+    nav .links a { font-size: 0.78rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-secondary); }
+
+    /* ===== Picker ===== */
+    .picker {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 200;
+      display: flex; gap: 0; border-radius: 999px; overflow: hidden;
+      background: oklch(0.15 0.01 260);
+      box-shadow: 0 8px 32px oklch(0 0 0 / 0.25);
+      padding: 4px;
+    }
+    .picker button {
+      border: none; cursor: pointer;
+      padding: 0.6rem 1.2rem;
+      font-family: var(--font-heading);
+      font-size: 0.72rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: oklch(0.7 0 0);
+      background: transparent;
+      border-radius: 999px;
+      transition: all 0.25s ease;
+    }
+    .picker button.active {
+      background: var(--accent);
+      color: oklch(0.12 0.01 260);
+    }
+    .picker button:hover:not(.active) { color: oklch(0.95 0 0); }
+
+    /* ===== Article ===== */
+    article { padding: 0 var(--gutter); }
+    .constrained { max-width: var(--max-w); margin: 0 auto; }
+
+    header { padding: calc(var(--nav-h) + clamp(3rem,6vw,6rem)) 0 clamp(2rem,4vw,4rem); }
+    .back {
+      display: inline-block; margin-bottom: 1.5rem;
+      font-family: var(--font-heading); font-size: 0.72rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--accent); text-decoration: none;
+    }
+    h1 {
+      font-family: var(--font-heading); font-size: clamp(2.5rem,5vw,4rem);
+      font-weight: 700; line-height: 0.92; letter-spacing: -0.02em;
+    }
+    .lead {
+      margin-top: 1rem; max-width: 50ch;
+      font-size: 1.1rem; line-height: 1.6;
+      color: var(--ink-secondary);
+    }
+    .meta { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+    .meta .date { font-size: 0.78rem; color: var(--ink-secondary); }
+    .meta .dot { color: var(--border); }
+    .tag {
+      background: var(--accent-subtle); padding: 0.15rem 0.5rem;
+      font-family: var(--font-heading); font-size: 0.62rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: oklch(from var(--accent) calc(l*0.75) c h);
+    }
+
+    /* ===== Image placeholder ===== */
+    .hero-img {
+      max-width: var(--max-w); margin: 0 auto 3rem;
+      aspect-ratio: 16/10; background: var(--accent-subtle);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-heading); font-size: 0.8rem;
+      color: var(--ink-secondary); text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    /* ===== Content grid ===== */
+    .content-grid {
+      display: grid; grid-template-columns: 1fr 280px; gap: 3rem;
+      padding-bottom: clamp(5rem,10vw,10rem);
+    }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
+
+    /* ===== Prose ===== */
+    .prose {
+      font-family: var(--font-serif);
+      font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+      line-height: 1.8;
+      color: var(--ink);
+      max-width: 65ch;
+      font-weight: 400;
+    }
+    .prose h2, .prose h3, .prose h4 {
+      font-family: var(--font-heading);
+      font-weight: 600; letter-spacing: -0.02em;
+      line-height: 1.2; margin-top: 2em; margin-bottom: 0.5em;
+    }
+    .prose h2 { font-size: 1.5rem; }
+    .prose h3 { font-size: 1.2rem; }
+    .prose p { margin-bottom: 1em; }
+    .prose a {
+      color: var(--accent); text-decoration: underline;
+      text-underline-offset: 3px; transition: color 0.2s;
+    }
+    .prose a:hover { color: var(--accent-hover); }
+    .prose ul, .prose ol { margin-bottom: 1em; padding-left: 1.5em; }
+    .prose li { margin-bottom: 0.3em; }
+    .prose blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1.25rem; margin: 1.5em 0;
+      color: var(--ink-secondary); font-style: italic;
+    }
+    .prose strong { font-weight: 500; }
+    .prose em { font-style: italic; }
+
+    /* ===== Aside ===== */
+    aside {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+    @media (min-width: 1025px) {
+      aside { border-top: 0; border-left: 1px solid var(--border); padding: 0 0 0 2rem; }
+    }
+    .aside-block + .aside-block { margin-top: 1.5rem; }
+    .aside-label {
+      margin-bottom: 0.25rem;
+      font-family: var(--font-heading); font-size: 0.68rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent);
+    }
+    .aside-value { font-size: 0.85rem; line-height: 1.6; color: var(--ink-secondary); }
+
+    /* ===== Font label ===== */
+    .font-label {
+      position: fixed; top: calc(var(--nav-h) + 1rem); right: var(--gutter); z-index: 150;
+      font-family: var(--font-heading); font-size: 0.68rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--accent); background: var(--accent-subtle);
+      padding: 0.4rem 0.8rem; border-radius: 4px;
+      transition: opacity 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="#">Ole Kristensen</a>
+    <div class="links">
+      <a href="#">Works</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="font-label" id="fontLabel">A: Source Serif 4</div>
+
+<article>
+  <div class="constrained">
+    <header>
+      <a href="#" class="back">← Works</a>
+      <h1>Multiplicity</h1>
+      <p class="lead">An interactive installation exploring the boundaries between physical and digital space through real-time projection mapping and motion tracking.</p>
+      <div class="meta">
+        <span class="date">2019</span>
+        <span class="dot">·</span>
+        <span class="tag">Featured</span>
+        <span class="tag">Installation</span>
+        <span class="tag">Interactive</span>
+      </div>
+    </header>
+  </div>
+
+  <div class="hero-img">16 : 10 image placeholder</div>
+
+  <div class="constrained">
+    <div class="content-grid">
+      <div class="prose" id="proseContent">
+        <p>Multiplicity is an immersive installation that transforms architectural surfaces into living, breathing canvases. Using an array of depth sensors and custom software built in openFrameworks, the work responds to the presence and movement of visitors in real time — creating a dialogue between body, light, and space.</p>
+
+        <h2>Concept</h2>
+        <p>The piece draws on ideas from quantum mechanics — specifically the superposition principle — where particles exist in multiple states simultaneously until observed. In <em>Multiplicity</em>, the projected imagery holds latent patterns that only resolve into coherent forms when a viewer enters the space. Each visitor collapses the visual field differently, meaning no two experiences are identical.</p>
+
+        <p>The aesthetic language is deliberately restrained: monochromatic fields of slowly morphing geometry, punctuated by moments of sudden crystallisation when the system detects stillness. This interplay between <strong>motion and pause</strong>, chaos and order, mirrors the tension at the heart of the quantum metaphor.</p>
+
+        <h2>Technical Approach</h2>
+        <p>The installation runs on a cluster of four machines, synchronised via a lightweight OSC protocol. Three Intel RealSense D455 cameras provide overlapping depth maps that are fused into a single point-cloud representation of the room. Custom GLSL shaders translate this volumetric data into a continuous 2D projection surface, maintaining the spatial coherence visitors expect while introducing uncanny distortions at the edges of perception.</p>
+
+        <h3>Software Stack</h3>
+        <p>Built with openFrameworks (C++), the rendering pipeline uses a deferred-shading approach to handle the high polygon count of the point cloud without sacrificing frame rate. Key libraries include:</p>
+        <ul>
+          <li><strong>ofxRealSense2</strong> — depth camera integration</li>
+          <li><strong>ofxOsc</strong> — inter-machine communication</li>
+          <li><strong>ofxGui</strong> — real-time parameter tuning</li>
+          <li>Custom Voronoi tessellation solver for the fragmentation visuals</li>
+        </ul>
+
+        <blockquote>
+          <p>"The most compelling interactive works are those where the technology becomes invisible — where the visitor forgets they are triggering changes and simply inhabits a world that seems to breathe alongside them."</p>
+        </blockquote>
+
+        <h2>Exhibition Context</h2>
+        <p>First shown at <a href="#">Kunsthal Charlottenborg</a> in Copenhagen as part of the <em>New Senses</em> group exhibition (2019), <em>Multiplicity</em> occupied a 12 × 8 metre darkened gallery space. The work was subsequently presented at Ars Electronica (Linz, 2020) and ZKM (Karlsruhe, 2021), each time adapted to the specific dimensions and acoustics of the host venue.</p>
+
+        <p>The piece is designed to accommodate anywhere from one to thirty simultaneous visitors. In smaller groups the experience is meditative and personal; as the crowd grows, the projections become increasingly turbulent and unpredictable, shifting the emotional register from contemplation to collective energy.</p>
+      </div>
+
+      <aside>
+        <div class="aside-block">
+          <div class="aside-label">Materials &amp; Equipment</div>
+          <p class="aside-value">Custom software (openFrameworks / C++), 3× Intel RealSense D455, 4× projection-mapped surfaces, 4-channel spatial audio</p>
+        </div>
+        <div class="aside-block">
+          <div class="aside-label">Partners</div>
+          <p class="aside-value">Kunsthal Charlottenborg, Alexandra Institute</p>
+        </div>
+        <div class="aside-block">
+          <div class="aside-label">Client</div>
+          <p class="aside-value">Danish Arts Foundation</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</article>
+
+<!-- Picker -->
+<div class="picker">
+  <button class="active" onclick="setFont('a')">A · Source Serif</button>
+  <button onclick="setFont('b')">B · Lora</button>
+  <button onclick="setFont('c')">C · Instrument Serif</button>
+</div>
+
+<script>
+  const fonts = {
+    a: { family: "'Source Serif 4', serif", weight: '400', label: 'A: Source Serif 4' },
+    b: { family: "'Lora', serif", weight: '400', label: 'B: Lora' },
+    c: { family: "'Instrument Serif', serif", weight: '400', label: 'C: Instrument Serif' },
+  };
+
+  function setFont(key) {
+    const f = fonts[key];
+    document.documentElement.style.setProperty('--font-serif', f.family);
+    document.getElementById('fontLabel').textContent = f.label;
+
+    // Update picker buttons
+    document.querySelectorAll('.picker button').forEach((btn, i) => {
+      btn.classList.toggle('active', btn.textContent.toLowerCase().startsWith(key));
+    });
+  }
+</script>
+
+</body>
+</html>

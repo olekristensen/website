@@ -10,6 +10,14 @@ tags:
   - Set Design
   - OpenFrameworks
   - Arduino
+technologies:
+  - OpenFrameworks
+  - Infrared Tracking
+  - Projection Mapping
+  - Arduino
+  - Cocoa
+  - DMX Lighting
+  - xBee
 materials: Infrared camera, videoprojectors, custom software
 partners: Jonas Jongejan, Tina Tarpgaard
 client: Recoil Performance Group
@@ -40,4 +48,6 @@ The fusion of “game theory” (a mathematical attempt to pre dict human behavi
 
 Fuck You Buddy was from the outset designed to be tour-friendly and as such our software is flexible and easily adjustable for different stage dimensions.
 
-The software for Fuck You Buddy builds on our move into Cocoa and Objective-C from [Frost](/works/frost). We integrate [openFrameworks](http://openframeworks.cc) into a cocoa-based Mac OS X Snow Leopard application running on a mac pro, seeing the dancers through a Point Grey Flea 2 IEEE 1394b camera, showing the openGL graphics using two video projectors, shooting diagonally onto a white square of dance floor. The projectors have 0.7 wide angle optics and the software is qued from qLab using apple’s midi networking capabilities. We control the led lighting, ir floods, lasers and tracking leds with arduino’s spewing dmx and using xBee’s.
+## Technical Approach
+
+The software for Fuck You Buddy builds on our move into Cocoa and Objective-C from [Frost](/works/5.frost). We integrate [openFrameworks](http://openframeworks.cc) into a cocoa-based Mac OS X Snow Leopard application running on a mac pro, seeing the dancers through a Point Grey Flea 2 IEEE 1394b camera, showing the openGL graphics using two video projectors, shooting diagonally onto a white square of dance floor. The projectors have 0.7 wide angle optics and the software is qued from qLab using apple’s midi networking capabilities. We control the led lighting, ir floods, lasers and tracking leds with arduino’s spewing dmx and using xBee’s.

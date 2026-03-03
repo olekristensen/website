@@ -10,6 +10,11 @@ tags:
   - Generative
   - Set Design
   - Quartz Composer
+technologies:
+  - Quartz Composer
+  - Stereography
+  - Videography
+  - Generative Animation
 materials: Videoprojectors, stereographic software, 3D glasses
 partners: Deborah Vlaeymans
 client: IN-TRANSIT
@@ -44,7 +49,11 @@ In january 2012 I travelled to the Yucatan peninsula with Deborah Vlaeymans. We 
 
 Our travel and stereographic films formed the basis of a series of 3D music performances in Copenhagen. I created a mobile 3D cinema, that travelled the city on a cargo bike. 
 
+## The Mobile 3D Cinema
+
 The stereoscopic films were combined with realtime stereographic animations. The show ran from qLab using Quartz Composer patches to integrate playback and animations. Our DIY projection setup was RealD compatible, and the audience could use the regular glasses from the cinema.
+
+## Reflections
 
 In our travels and the research we learned a lot, not just about how to work with stereoscopic content and the intricate details of the ancient Mayan calendar. The Mayans we met lived very modest lives in small villages among the ancient ruins. They earned next to nothing from the vast tourist groups visiting their heritage on daytrips. The tax-exempt all-inclusive hotels in Cancun made sure to insource all revenue generating activities.
 

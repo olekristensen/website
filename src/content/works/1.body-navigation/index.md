@@ -10,6 +10,12 @@ tags:
   - Set Design
   - Featured
   - Processing
+technologies:
+  - Processing
+  - Infrared Tracking
+  - Projection Mapping
+  - OpenGL
+  - OSC
 materials: Infrared camera, videoprojector, processing code
 partners: Jonas Jongejan, Tina Tarpgaard
 client: Recoil Performance Group
@@ -34,7 +40,7 @@ appearances:
   - date: Jan 2010
     occasion: Plaza+ Festival
     place: Plaza Futura, Eindhoven
-    url: http://www.plazaplus.nl/NL/PROGRAMMA&amp;item_id=37
+    url: http://www.plazaplus.nl/NL/PROGRAMMA&item_id=37
   - date: Nov 2009
     occasion: Ke∂ja
     place: KHiO, Oslo
@@ -56,6 +62,10 @@ videos:
 
 Two dancers and their digital reproduction are the scenographic frame of this humorous and emotional portrait of human relations. Based on rules and structured in a game like manner, the installation makes way for a playful dialog between the man, woman and the digital “footprints” they leave behind.
 
+## Background
+
 The Body Navigation performance was originally part of a larger installation and modern dance performance in Copenhagen, by Tim Rushton, Danish Dance Theatre called Labyrint.
+
+## Technical Approach
 
 We used processing for the infrared blobtracking of the dancers and drawing the open gl graphics. During the performance Tina controlled the whole thing live from an Isadora-based interface via osc.

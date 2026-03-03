@@ -9,6 +9,12 @@ tags:
   - Processing
   - Generative
   - Drawing
+technologies:
+  - Arduino
+  - Processing
+  - HPGL
+  - Generative Algorithms
+  - Embedded Firmware
 materials: Plotter, arduino, electronics, custom firmware
 github:
   user: olekristensen
@@ -48,12 +54,21 @@ videos:
     title: Trailer by Ole Kristensen
 ---
 
-Reviving an old Roland plotter, i programmed it to doodle in Processing. 
+Reviving an old Roland plotter, I programmed it to doodle in [Processing](https://processing.org). 
 It took a few months, but it eventually ended up doodling the same way I do myself during long sedentary phone conversations.
 It has since been updated to run from an embedded Arduino chip.
-The complexity of the doodles is higher than i usually do them by hand and look slightly manic.
+The complexity of the doodles is higher than I usually do them by hand and look slightly manic.
+
+## How It Works
+
 Before starting up a doodle, the plotter has to be loaded with paper, and the button pressed. The plotter will describe itself, and plot a start price. It doodles until stopped, occasionally raising the price at a rate of 12 € an hour.
 When stopped, it signs and numbers the drawing.
 The resulting sheet is sold as a unique pen drawing.
+
+The embedded version runs an Arduino sketch that sends [HPGL](https://en.wikipedia.org/wiki/HPGL) drawing commands to the plotter over serial. The generative doodling algorithm was originally written in [Processing](https://processing.org), then ported to run autonomously on the Arduino microcontroller.
+
+
+## Acknowledgements
+
 The plotter has been doodling away for some time at Halfmachine, and has been exhibited at the Alt_Cph opening, curated by Stine Hebert and Mikrogalleriet.
 Thanks to Jacob Sikker Remin from Mikrogalleriet for helping me with the project. Thanks to the guys at Illutron for helping me cram version 2.0 into an arduino. And to Peet from Black Box Gallery, who put it up in Brunnhofer Galerie in Linz parallel to Ars Electronica 2010.

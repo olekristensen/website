@@ -9,6 +9,12 @@ tags:
   - Photography
   - Interactive
   - OpenFrameworks
+technologies:
+  - OpenFrameworks
+  - Processing
+  - Infrared Tracking
+  - DSLR Photography
+  - Database
 materials: Infrared camera, DSLR camera, bespoke software
 partners: Jonas Jongejan
 photocredits: Frederik Hilmer and Jonas Jongejan
@@ -20,7 +26,7 @@ appearances:
   - date: Sept 2008
     occasion: New Media Meeting 3
     place: Norrköping, Sweden
-    url: http//www.newmediameeting.se/#img_title:title.php?str=artists^lb:media.php?type=image&table=artists&id=20&n=0^lt:navigation.php^rb:artists.php?id=20^rt:artists.php?part=navigation&id=2
+    url: http://www.newmediameeting.se/#img_title:title.php?str=artists^lb:media.php?type=image&table=artists&id=20&n=0^lt:navigation.php^rb:artists.php?id=20^rt:artists.php?part=navigation&id=2
   - date: Sept 2008
     occasion: Pecha Kucha
     place: Brorsons Church, Copenhagen
@@ -40,6 +46,8 @@ videos:
 
 An interactive photo installation created for a 4,5 x 8 meter LED monolith that works fine on a projection. Combining infrared tracking of a normal light bulb and still images, to index photos of audience in a database according to bulb position within the picture frame. When participating audience moves the bulb within the field of view, the screen flickers through previous images of other people having had the bulb at the same position. When someone moves the bulb to an unihabited spot with no previous images, it will flash and that person will now be shown when the bulb is put in the same position.
 
-Jonas and i sketched up the installation in a few days for re:new 2008, on a very short notice. First iteration was done in processing, but with memory issues. Despite that it ended up having a playful and informal presence in the Copenhagen Main Square.
+## Development
 
-We have since then been invited to New Media Meeting 03, where we decided to port the software into open frameworks, and spent two days bashing a Nikon D80 into submission. The installation ran smoothly.
+Jonas and I sketched up the installation in a few days for re:new 2008, on a very short notice. First iteration was done in [Processing](https://processing.org), but with memory issues. Despite that it ended up having a playful and informal presence in the Copenhagen Main Square.
+
+We have since then been invited to New Media Meeting 03, where we decided to port the software into [openFrameworks](http://openframeworks.cc), and spent two days bashing a Nikon D80 into submission. The installation ran smoothly.

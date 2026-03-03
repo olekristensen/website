@@ -1,7 +1,7 @@
 ---
 title: Living Room
 date: April 2012
-lead: Award winning trompe-l'&oelig;il on the dance floor
+lead: Award winning trompe-l'œil on the dance floor
 tags:
   - Modern Dance
   - Projection Mapping
@@ -10,6 +10,13 @@ tags:
   - Set Design
   - Featured
   - OpenFrameworks
+technologies:
+  - OpenFrameworks
+  - Infrared Tracking
+  - Projection Mapping
+  - Cocoa
+  - MIDI
+  - OSC
 materials: Infrared camera, videoprojectors, custom software
 partners: Jonas Jongejan, Tina Tarpgaard
 client: Recoil Performance Group
@@ -47,6 +54,11 @@ videos:
 
 Living Room is a performance of an hour with 3 dancers on stage. The projected scenography evolves during the whole performance. Most of the video scenography is made of a polygon world that is randomly generated in the beginning of each performance. During the show it is being crumbled and manipulated live by the dancers.
 
- For this performance I co-developed the scenographic concept and implemented some new concepts in our software. Most notable a simple method of independently rotating the z-axis of a plane to allow for trompe-l'&oelig;il effects of eg. holes in the floor from a movable vantage point in the audience seating. 
- 
- The software for Living Room builds further on Cocoa and Objective-C wrapper for openFrameworks; [ofxCocoaPlugins](https://github.com/HalfdanJ/ofxCocoaPlugins). We intergrate [openFrameworks](http://openframeworks.cc) into a cocoa-based Mac OS X Lion application running on a mac pro, seeing the dancers through a Allied Vision Technologies Manta camera, showing the openGL graphics using two video projectors, shooting diagonally onto the white dance floor. The two projectors have 0.7 wide angle optics and the software is qued from qLab using apple’s midi networking capabilities.
+## Scenographic Concept
+
+For this performance I co-developed the scenographic concept and implemented some new concepts in our software. Most notable a simple method of independently rotating the z-axis of a plane to allow for trompe-l'œil effects of eg. holes in the floor from a movable vantage point in the audience seating.
+
+## Software
+
+The software for Living Room builds further on Cocoa and Objective-C wrapper for openFrameworks; [ofxCocoaPlugins](https://github.com/HalfdanJ/ofxCocoaPlugins). We intergrate [openFrameworks](http://openframeworks.cc) into a cocoa-based Mac OS X Lion application running on a mac pro, seeing the dancers through a Allied Vision Technologies Manta camera, showing the openGL graphics using two video projectors, shooting diagonally onto the white dance floor. The two projectors have 0.7 wide angle optics and the software is qued from qLab using apple’s midi networking capabilities.
+ofxCocoaPlugins — a MIDI and OSC-addressable wrapper that integrates calibration of infrared tracking, projection mapping and Cocoa — has been the backbone of all Recoil Performance Group scenographies.

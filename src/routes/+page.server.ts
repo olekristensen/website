@@ -1,4 +1,4 @@
-import { getContentList } from '$lib/content';
+import { getContentList, getContent } from '$lib/content';
 import type { PageServerLoad } from './$types';
 
 function extractYear(date?: string): number {
@@ -11,16 +11,43 @@ export const load: PageServerLoad = async () => {
 	const works = await getContentList('works');
 	const consultancies = await getContentList('consultancies');
 
+	const [worksSection, consultanciesSection, aboutSection] = await Promise.all([
+		getContent('works', ''),
+		getContent('consultancies', ''),
+		getContent('about', '')
+	]);
+
 	// Sort newest first
 	works.sort((a, b) => extractYear(b.meta.date) - extractYear(a.meta.date));
 	consultancies.sort((a, b) => extractYear(b.meta.date) - extractYear(a.meta.date));
 
-	// Get featured items (newest 3)
-	const featured = works.slice(0, 3);
+	// Featured works: those tagged "Featured", sorted newest first
+	const featuredWorks = works.filter((w) => w.meta.tags?.includes('Featured'));
+
+	// Get top 3 featured for the selected works grid
+	const featured = featuredWorks.slice(0, 3);
+
+	// Hero slideshow images — from featured works
+	const heroImages = featuredWorks
+		.filter((w) => w.images.thumb)
+		.map((w) => {
+			const base = w.images.thumb!.replace('thumb-480.jpg', '');
+			return {
+				sizes: [
+					{ width: 480, url: `${base}thumb-480.jpg` },
+					{ width: 960, url: `${base}thumb-960.jpg` },
+					{ width: 1920, url: `${base}thumb-1920.jpg` }
+				]
+			};
+		});
 
 	return {
 		featured,
+		heroImages,
 		allWorks: works,
-		consultancies
+		consultancies,
+		worksSection,
+		consultanciesSection,
+		aboutSection
 	};
 };
