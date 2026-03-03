@@ -201,3 +201,33 @@ Minimal: copyright + GitHub and LinkedIn links. Centered on small screens, row l
 - **Mobile-first** with responsive breakpoints (`md:`, `lg:`, `sm:`)
 
 - Writing style for work descriptions: Direct, Scandinavian, artist-driven tone. Avoid business jargon; focus on personal, technical, and collaborative aspects. Use clear, unembellished language reflecting the artist's perspective.
+
+## Docker & Deployment
+
+- Static output (`build/`) is served by a rootless Nginx container (`nginxinc/nginx-unprivileged:alpine`)
+- Container listens on port **8080** (non-root; no ports below 1024)
+- Multi-stage Dockerfile: Node.js stage runs `pnpm install && pnpm build`, Nginx stage copies the `build/` output
+- Custom `nginx.conf` for SPA fallback, gzip, cache headers, and security headers
+- `.dockerignore` excludes `node_modules`, `.svelte-kit`, etc. to keep the build context small
+
+### Docker commands
+
+```sh
+docker build -t denfrievilje .
+docker run -p 8080:8080 denfrievilje
+```
+
+## CI/CD (GitHub Actions)
+
+Two workflows in `.github/workflows/`:
+
+| File | Triggers | Steps |
+|------|----------|-------|
+| `ci.yml` | Push / PR to `main` | Install → Lint → Type-check → Build |
+| `docker.yml` | Push to `main` / version tags (`v*`) | Build & push Docker image to GitHub Container Registry (GHCR) |
+
+The Docker workflow tags images as `latest` (on main) and the Git tag (on version tags).
+
+## Documentation
+
+Design rationale is recorded in `docs/design-decisions.md`. Content conventions in `docs/content-structure.md`. This file serves as the primary AI agent reference.

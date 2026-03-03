@@ -1,0 +1,15 @@
+node_modules
+.svelte-kit
+.git
+.gitignore
+.vscode
+.idea
+.agents
+*.md
+!README.md
+test
+docs
+build
+.env*
+*.log
+.DS_Store

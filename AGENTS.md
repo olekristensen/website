@@ -67,6 +67,26 @@ See [docs/agent-knowledge.md](docs/agent-knowledge.md) for the full design syste
 - `extractYear()` helper is currently duplicated in 3 route files — follow existing pattern until centralized
 - The `build/` directory is committed for deployment — rebuild after content/code changes
 
+## Docker
+
+Rootless Nginx container for static serving:
+
+```sh
+docker build -t denfrievilje .
+docker run -p 8080:8080 denfrievilje
+```
+
+- Multi-stage build: Node.js → `pnpm build` → `nginxinc/nginx-unprivileged:alpine` (port 8080)
+- `nginx.conf` handles SPA fallback, gzip, cache headers, security headers
+- `.dockerignore` keeps the build context lean
+
+## CI/CD (GitHub Actions)
+
+| Workflow | File | Triggers |
+|----------|------|----------|
+| CI | `.github/workflows/ci.yml` | Push/PR to `main` — install, lint, check, build |
+| Docker | `.github/workflows/docker.yml` | Push to `main` / `v*` tags — build & push to GHCR |
+
 ## Svelte MCP Tools
 
 Use the Svelte MCP server for comprehensive Svelte 5/SvelteKit documentation:
