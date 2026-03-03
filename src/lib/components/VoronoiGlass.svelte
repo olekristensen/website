@@ -39,6 +39,8 @@
 		gridRadius?: number;
 		/** Lloyd relaxation iterations (higher = more uniform cells) */
 		relaxationIterations?: number;
+		/** Callback fired once images are loaded and initial brightness is known */
+		onready?: () => void;
 	}
 
 	let {
@@ -57,7 +59,8 @@
 		showGrid = false,
 		gridColor = 'rgba(0, 255, 136, 1)',
 		gridRadius = 300,
-		relaxationIterations = 5
+		relaxationIterations = 5,
+		onready
 	}: Props = $props();
 
 	const COVER_PAD = $derived(refractMax + 10);
@@ -1037,6 +1040,8 @@
 				loaded++;
 				if (loaded === total) {
 					ready = true;
+					analyzeImageBrightness(loadedImages[currentIdx]);
+					onready?.();
 					slideshowInterval = setInterval(triggerTransition, holdDuration);
 					animFrame = requestAnimationFrame(mainLoop);
 				}

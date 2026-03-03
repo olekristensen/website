@@ -15,6 +15,8 @@
 	let isDark = $derived(bottomBrightness < 0.45);
 	let textColor = $derived(isDark ? 'color(display-p3 1 1 1)' : 'color(display-p3 0 0 0)');
 
+	let overlayReady = $state(false);
+
 	let mdUp = $state(false);
 	$effect(() => {
 		const mq = window.matchMedia('(min-width: 768px)');
@@ -31,18 +33,18 @@
 <section class="relative -mt-[var(--nav-h)] h-[100svh]">
 	{#if images.length > 0}
 		<div class="absolute inset-0">
-			<VoronoiGlass {images} bind:bottomBrightness />
+			<VoronoiGlass {images} bind:bottomBrightness onready={() => overlayReady = true} />
 		</div>
 	{/if}
 	<div
 		class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[55%] transition-opacity duration-[2.5s] ease-in-out"
-		style="background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%); opacity: {isDark ? 1 : 0}"
+		style="background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%); opacity: {overlayReady && isDark ? 1 : 0}"
 	></div>
 	<div
 		class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[55%] transition-opacity duration-[2.5s] ease-in-out"
-		style="background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 100%); opacity: {isDark ? 0 : 1}"
+		style="background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 100%); opacity: {overlayReady && !isDark ? 1 : 0}"
 	></div>
-	<div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-[var(--gutter)] pb-[clamp(2rem,5vh,5rem)] transition-colors duration-[2.5s] ease-in-out" style="color: {textColor}">
+	<div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-[var(--gutter)] pb-[clamp(2rem,5vh,5rem)] transition-[color,opacity] duration-[2.5s] ease-in-out" style="color: {textColor}; opacity: {overlayReady ? 1 : 0}">
 		<div class="mx-auto grid max-w-[var(--max-w)] grid-cols-1 items-end md:grid-cols-2">
 			<div class="pt-[clamp(1.5rem,3vh,3rem)] pb-[clamp(1.5rem,3vh,3rem)]">
 				<h1

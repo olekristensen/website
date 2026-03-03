@@ -31,7 +31,7 @@ This video installation was made to complement the rerun of Frost, a modern danc
 
 In the summer of 2009 I travelled up the coast of Nothwestern Greenland with Annesofie Norn in preparation for our project 'Longing Fast Forward'. This video installation is based on the footage from this research trip. The installation features Quillaq from the settlement Savissivik
 
-Related work: [Longing Fast Forward](/works/11.longing-fast-forward)
+Related work: [Longing Fast Forward](/works/longing-fast-forward)
 
 ## Connection to Frost
 
