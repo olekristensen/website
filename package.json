@@ -41,7 +41,8 @@
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"esbuild",
-			"sharp"
+			"sharp",
+			"svelte-preprocess"
 		]
 	},
 	"dependencies": {
