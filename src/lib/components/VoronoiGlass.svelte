@@ -29,6 +29,16 @@
 		waveSpeed?: number;
 		/** Max shading overlay alpha */
 		shadeMaxAlpha?: number;
+		/** Brightness of bottom portion (0 = dark, 1 = light), bindable */
+		bottomBrightness?: number;
+		/** Show tessellation grid lines radiating from cursor */
+		showGrid?: boolean;
+		/** Grid line color (CSS color string) */
+		gridColor?: string;
+		/** Grid fade radius from cursor (px) */
+		gridRadius?: number;
+		/** Lloyd relaxation iterations (higher = more uniform cells) */
+		relaxationIterations?: number;
 	}
 
 	let {
@@ -42,7 +52,12 @@
 		mouseRadius = 220,
 		mouseSeedStrength = 25,
 		waveSpeed = 0.65,
-		shadeMaxAlpha = 0.25
+		shadeMaxAlpha = 0.25,
+		bottomBrightness = $bindable(0.5),
+		showGrid = false,
+		gridColor = 'rgba(0, 255, 136, 1)',
+		gridRadius = 300,
+		relaxationIterations = 5
 	}: Props = $props();
 
 	const COVER_PAD = $derived(refractMax + 10);
@@ -74,6 +89,10 @@
 	let activeResolution = 0; // current loaded width tier
 	let pendingReload = false; // background reload in progress
 
+	// Seed drift during transitions
+	let seedDriftVelocities: { vx: number; vy: number }[] = [];
+	let driftActive = false;
+
 	// Activity system
 	let activityLevel = 0;
 	let lastStimulusTime = 0;
@@ -98,6 +117,17 @@
 	let isDragging = false;
 	let cellDragReveal: number[] = [];
 
+	// Brightness analysis
+	let smoothedBrightness = 0.5;
+	let brightnessFrameCounter = 0;
+
+	// Resolved grid color for canvas (stored as "r, g, b" for rgba())
+	let resolvedGridColor = '0, 255, 136';
+
+	// Grid cursor state
+	let gridCursorX = 0, gridCursorY = 0;
+	let gridOpacity = 0;
+
 	// Transition state
 	let transitioning = false;
 	let transitionStart = 0;
@@ -115,13 +145,17 @@
 
 	// ===== Voronoi seed generation + Lloyd relaxation =====
 	function generateSeeds() {
-		let rng = 77;
+		let rng = (Math.random() * 2147483646 + 1) | 0;
 		const rand = () => { rng = (rng * 16807) % 2147483647; return rng / 2147483647; };
 		baseSeeds = [];
 		for (let i = 0; i < cellCount; i++) {
 			baseSeeds.push({ x: rand() * W, y: rand() * H });
 		}
-		for (let iter = 0; iter < 5; iter++) {
+		const fullIters = Math.floor(relaxationIterations);
+		const frac = relaxationIterations - fullIters;
+		const totalIters = frac > 0 ? fullIters + 1 : fullIters;
+		for (let iter = 0; iter < totalIters; iter++) {
+			const blend = (iter < fullIters) ? 1 : frac;
 			const regions = baseSeeds.map(() => ({ sx: 0, sy: 0, count: 0 }));
 			const step = 3;
 			for (let y = 0; y < H; y += step) {
@@ -139,8 +173,10 @@
 			}
 			for (let i = 0; i < baseSeeds.length; i++) {
 				if (regions[i].count > 0) {
-					baseSeeds[i].x = regions[i].sx / regions[i].count;
-					baseSeeds[i].y = regions[i].sy / regions[i].count;
+					const cx = regions[i].sx / regions[i].count;
+					const cy = regions[i].sy / regions[i].count;
+					baseSeeds[i].x += (cx - baseSeeds[i].x) * blend;
+					baseSeeds[i].y += (cy - baseSeeds[i].y) * blend;
 				}
 			}
 		}
@@ -508,10 +544,17 @@
 
 	function animateSeeds() {
 		let moved = false;
+		const wrapThreshX = W * 0.4;
+		const wrapThreshY = H * 0.4;
 		for (let i = 0; i < seeds.length; i++) {
 			const dx = targetSeeds[i].x - seeds[i].x;
 			const dy = targetSeeds[i].y - seeds[i].y;
-			if (Math.abs(dx) > 0.02 || Math.abs(dy) > 0.02) {
+			// Snap on wrap instead of interpolating across the canvas
+			if (Math.abs(dx) > wrapThreshX || Math.abs(dy) > wrapThreshY) {
+				seeds[i].x = targetSeeds[i].x;
+				seeds[i].y = targetSeeds[i].y;
+				moved = true;
+			} else if (Math.abs(dx) > 0.02 || Math.abs(dy) > 0.02) {
 				seeds[i].x += dx * SEED_DAMPING;
 				seeds[i].y += dy * SEED_DAMPING;
 				moved = true;
@@ -590,6 +633,36 @@
 		transitioning = true;
 		transitionStart = performance.now();
 		resetSlideshowTimer();
+		analyzeImageBrightness(loadedImages[toIdx]);
+		startSeedDrift();
+	}
+
+	function startSeedDrift() {
+		let rng = performance.now() & 0x7fffffff;
+		const rand = () => { rng = (rng * 16807) % 2147483647; return (rng / 2147483647) * 2 - 1; };
+		seedDriftVelocities = [];
+		for (let i = 0; i < cellCount; i++) {
+			const speed = 0.3 + Math.abs(rand()) * 0.5;
+			const angle = rand() * Math.PI;
+			seedDriftVelocities.push({
+				vx: Math.cos(angle) * speed,
+				vy: Math.sin(angle) * speed
+			});
+		}
+		driftActive = true;
+	}
+
+	function updateSeedDrift() {
+		if (!driftActive) return;
+		for (let i = 0; i < baseSeeds.length; i++) {
+			baseSeeds[i].x += seedDriftVelocities[i].vx;
+			baseSeeds[i].y += seedDriftVelocities[i].vy;
+			// Toroidal wrap
+			if (baseSeeds[i].x < 0) baseSeeds[i].x += W;
+			else if (baseSeeds[i].x > W) baseSeeds[i].x -= W;
+			if (baseSeeds[i].y < 0) baseSeeds[i].y += H;
+			else if (baseSeeds[i].y > H) baseSeeds[i].y -= H;
+		}
 	}
 
 	// ===== Drawing =====
@@ -605,6 +678,7 @@
 				if (!poly || poly.length < 3) continue;
 				shadeCellPoly(poly, i, cellActivityLevels[i]);
 			}
+			if (showGrid) drawTessellationGrid();
 			return;
 		}
 
@@ -740,16 +814,162 @@
 		if (transitioning && allDone) {
 			currentIdx = toIdx;
 			transitioning = false;
+			driftActive = false;
 			cellDragReveal.fill(0);
+		}
+
+		if (showGrid) drawTessellationGrid();
+	}
+
+	function drawTessellationGrid() {
+		if (!ctx || seeds.length === 0 || adjacency.length === 0) return;
+
+		let cx: number, cy: number, active: boolean;
+		if (mouseOverCanvas) {
+			cx = canvasMouseX;
+			cy = canvasMouseY;
+			active = true;
+		} else if (waveCursorActive) {
+			cx = waveOriginX;
+			cy = waveOriginY;
+			active = true;
+		} else {
+			active = false;
+			cx = gridCursorX;
+			cy = gridCursorY;
+		}
+
+		// Fade grid opacity in/out
+		if (active) {
+			gridOpacity = Math.min(1, gridOpacity + 0.08);
+			gridCursorX = cx;
+			gridCursorY = cy;
+		} else {
+			gridOpacity = Math.max(0, gridOpacity - 0.03);
+		}
+
+		if (gridOpacity < 0.003) return;
+
+		ctx.lineWidth = 3;
+		const gc = resolvedGridColor;
+
+		// Draw all Delaunay edges, fading by distance from cursor
+		const drawn = new Set<string>();
+		for (let i = 0; i < seeds.length; i++) {
+			for (const j of adjacency[i]) {
+				if (j <= i) continue; // each edge once
+				const ax = seeds[i].x, ay = seeds[i].y;
+				const bx = seeds[j].x, by = seeds[j].y;
+
+				// Alpha at each endpoint based on distance from cursor
+				const dA = Math.sqrt((ax - cx) ** 2 + (ay - cy) ** 2);
+				const dB = Math.sqrt((bx - cx) ** 2 + (by - cy) ** 2);
+				let alphaA = Math.max(0, 1 - dA / gridRadius);
+				let alphaB = Math.max(0, 1 - dB / gridRadius);
+				alphaA = alphaA * alphaA * gridOpacity;
+				alphaB = alphaB * alphaB * gridOpacity;
+
+				if (alphaA < 0.005 && alphaB < 0.005) continue;
+
+				const grad = ctx.createLinearGradient(ax, ay, bx, by);
+				grad.addColorStop(0, `rgba(${gc}, ${alphaA})`);
+				grad.addColorStop(1, `rgba(${gc}, ${alphaB})`);
+				ctx.strokeStyle = grad;
+				ctx.beginPath();
+				ctx.moveTo(ax, ay);
+				ctx.lineTo(bx, by);
+				ctx.stroke();
+			}
+		}
+		ctx.globalAlpha = 1;
+	}
+
+	function analyzeBottomBrightness() {
+		if (!ctx || W === 0 || H === 0 || loadedImages.length === 0) return;
+		if (transitioning) return; // use predictive value during transitions
+
+		const sampleH = Math.max(1, Math.floor(H * 0.25 * DPR));
+		const startY = Math.floor(H * DPR) - sampleH;
+		const w = Math.floor(W * DPR);
+
+		if (w <= 0 || sampleH <= 0) return;
+
+		try {
+			const imageData = ctx.getImageData(0, startY, w, sampleH);
+			const data = imageData.data;
+
+			let totalLuminance = 0;
+			let count = 0;
+			const step = 32;
+
+			for (let i = 0; i < data.length; i += step * 4) {
+				totalLuminance += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+				count++;
+			}
+
+			const avgLuminance = count > 0 ? totalLuminance / count / 255 : 0.5;
+			smoothedBrightness += (avgLuminance - smoothedBrightness) * 0.05;
+			bottomBrightness = smoothedBrightness;
+		} catch {
+			// getImageData may fail with tainted canvas
+		}
+	}
+
+	/** Analyze a specific image's bottom brightness using an offscreen canvas */
+	function analyzeImageBrightness(img: HTMLImageElement) {
+		if (!img || !img.complete || img.naturalWidth === 0 || W === 0 || H === 0) return;
+
+		try {
+			const params = coverParams(img, 0, 0);
+			if (!params) return;
+
+			const sW = Math.round(W * 0.25);
+			const sH = Math.round(H * 0.25);
+			if (sW <= 0 || sH <= 0) return;
+
+			const offscreen = document.createElement('canvas');
+			offscreen.width = sW;
+			offscreen.height = sH;
+			const octx = offscreen.getContext('2d');
+			if (!octx) return;
+
+			const scale = sW / W;
+			octx.drawImage(img, params.dx * scale, params.dy * scale, params.dw * scale, params.dh * scale);
+
+			const sampleH = Math.max(1, Math.floor(sH * 0.25));
+			const data = octx.getImageData(0, sH - sampleH, sW, sampleH).data;
+
+			let totalLuminance = 0;
+			let count = 0;
+			const step = 8;
+
+			for (let i = 0; i < data.length; i += step * 4) {
+				totalLuminance += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+				count++;
+			}
+
+			const avgLuminance = count > 0 ? totalLuminance / count / 255 : 0.5;
+			smoothedBrightness = avgLuminance;
+			bottomBrightness = avgLuminance;
+		} catch {
+			// may fail with tainted canvas
 		}
 	}
 
 	function mainLoop() {
 		const now = performance.now();
 		updateActivity(now);
+		updateSeedDrift();
 		updateSeedTargets();
 		animateSeeds();
 		drawScene(now);
+
+		brightnessFrameCounter++;
+		if (brightnessFrameCounter >= 10) {
+			brightnessFrameCounter = 0;
+			analyzeBottomBrightness();
+		}
+
 		animFrame = requestAnimationFrame(mainLoop);
 	}
 
@@ -864,6 +1084,23 @@
 
 		resize();
 		loadImages();
+
+		if (showGrid) {
+			// Resolve CSS color to "r, g, b" string for gradient stops
+			let rawColor = gridColor;
+			if (gridColor.startsWith('var(')) {
+				const prop = gridColor.slice(4, -1).trim();
+				rawColor = getComputedStyle(containerEl).getPropertyValue(prop).trim() || '#00ff88';
+			}
+			// Use a temp canvas to parse any CSS color into RGBA
+			const tmp = document.createElement('canvas');
+			tmp.width = tmp.height = 1;
+			const tmpCtx = tmp.getContext('2d')!;
+			tmpCtx.fillStyle = rawColor;
+			tmpCtx.fillRect(0, 0, 1, 1);
+			const [r, g, b] = tmpCtx.getImageData(0, 0, 1, 1).data;
+			resolvedGridColor = `${r}, ${g}, ${b}`;
+		}
 
 		// Device orientation
 		if (typeof DeviceOrientationEvent !== 'undefined' &&
