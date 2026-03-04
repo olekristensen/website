@@ -107,25 +107,25 @@ The Dockerfile uses a multi-stage build: Node.js for `pnpm build`, then copies t
 
 GitHub Actions workflows in `.github/workflows/`:
 
-| Workflow | Trigger | What it does |
-|----------|---------|--------------|
-| `ci.yml` | Push / PR to `main` | Install, lint, type-check, build |
+| Workflow     | Trigger               | What it does                      |
+| ------------ | --------------------- | --------------------------------- |
+| `ci.yml`     | Push / PR to `main`   | Install, lint, type-check, build  |
 | `docker.yml` | Push to `main` / tags | Build & push Docker image to GHCR |
 
 ## Tech Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Svelte | 5 | UI framework (runes: `$props()`, `$state()`, `$derived()`) |
-| SvelteKit | 2 | Routing, SSG via `adapter-static` |
-| Tailwind CSS | 4 | Utility-first styling, `@tailwindcss/vite` plugin |
-| TypeScript | 5 | Type safety throughout |
-| Sharp | 0.34 | Image thumbnail generation |
-| Marked | 17 | Markdown → HTML |
-| js-yaml | 4 | YAML frontmatter parsing |
-| Vite | 5 | Build tooling |
-| Vitest | 1 | Testing |
-| Nginx | unprivileged | Production static serving |
+| Technology   | Version      | Purpose                                                    |
+| ------------ | ------------ | ---------------------------------------------------------- |
+| Svelte       | 5            | UI framework (runes: `$props()`, `$state()`, `$derived()`) |
+| SvelteKit    | 2            | Routing, SSG via `adapter-static`                          |
+| Tailwind CSS | 4            | Utility-first styling, `@tailwindcss/vite` plugin          |
+| TypeScript   | 5            | Type safety throughout                                     |
+| Sharp        | 0.34         | Image thumbnail generation                                 |
+| Marked       | 17           | Markdown → HTML                                            |
+| js-yaml      | 4            | YAML frontmatter parsing                                   |
+| Vite         | 5            | Build tooling                                              |
+| Vitest       | 1            | Testing                                                    |
+| Nginx        | unprivileged | Production static serving                                  |
 
 ## License
 

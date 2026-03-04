@@ -11,9 +11,10 @@ import sharp from 'sharp';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src', 'content');
 const OUTPUT_DIR = path.join(process.cwd(), 'static', 'content');
-const THUMB_WIDTH = 480;
+const THUMB_WIDTHS = [480, 960, 1920];
 const THUMB_QUALITY = 75;
 const IMAGE_RE = /\.(jpg|jpeg|png|gif|webp)$/i;
+const STATIC_FILE_RE = /\.(pdf|svg|mp4|mp3|zip|doc|docx)$/i;
 const THUMB_RE = /^(thumb|00\.thumb)\.(jpg|jpeg|png|gif|webp)$/i;
 
 function extractSlug(dirname) {
@@ -26,7 +27,7 @@ async function processSection(section) {
 	const sectionDir = path.join(CONTENT_DIR, section);
 	if (!fs.existsSync(sectionDir)) return;
 
-	const entries = fs.readdirSync(sectionDir).filter(name => {
+	const entries = fs.readdirSync(sectionDir).filter((name) => {
 		return fs.statSync(path.join(sectionDir, name)).isDirectory();
 	});
 
@@ -35,7 +36,7 @@ async function processSection(section) {
 		const srcDir = path.join(sectionDir, entry);
 		const destDir = path.join(OUTPUT_DIR, section, slug);
 
-		const files = fs.readdirSync(srcDir).filter(f => IMAGE_RE.test(f));
+		const files = fs.readdirSync(srcDir).filter((f) => IMAGE_RE.test(f));
 		if (files.length === 0) continue;
 
 		fs.mkdirSync(destDir, { recursive: true });
@@ -50,19 +51,22 @@ async function processSection(section) {
 				fs.copyFileSync(srcPath, destPath);
 			}
 
-			// Generate scaled thumbnail for thumb images
+			// Generate scaled thumbnails for thumb images
 			if (THUMB_RE.test(file)) {
-				const ext = path.extname(file);
-				const thumbDest = path.join(destDir, `thumb-${THUMB_WIDTH}${ext}`);
-				if (!fs.existsSync(thumbDest) || fs.statSync(thumbDest).mtimeMs < srcStat.mtimeMs) {
-					try {
-						await sharp(srcPath)
-							.resize(THUMB_WIDTH, null, { withoutEnlargement: true })
-							.jpeg({ quality: THUMB_QUALITY, mozjpeg: true })
-							.toFile(thumbDest.replace(ext, '.jpg'));
-						// If the source wasn't .jpg, also write with .jpg ext
-					} catch (err) {
-						console.warn(`  ⚠ Failed to generate thumb for ${section}/${slug}/${file}:`, err.message);
+				for (const width of THUMB_WIDTHS) {
+					const thumbDest = path.join(destDir, `thumb-${width}.jpg`);
+					if (!fs.existsSync(thumbDest) || fs.statSync(thumbDest).mtimeMs < srcStat.mtimeMs) {
+						try {
+							await sharp(srcPath)
+								.resize(width, null, { withoutEnlargement: true })
+								.jpeg({ quality: THUMB_QUALITY, mozjpeg: true })
+								.toFile(thumbDest);
+						} catch (err) {
+							console.warn(
+								`  ⚠ Failed to generate thumb-${width} for ${section}/${slug}/${file}:`,
+								err.message
+							);
+						}
 					}
 				}
 			}
@@ -85,7 +89,9 @@ async function main() {
 	if (fs.existsSync(aboutDir)) {
 		const aboutDest = path.join(OUTPUT_DIR, 'about');
 		fs.mkdirSync(aboutDest, { recursive: true });
-		for (const f of fs.readdirSync(aboutDir).filter(f => IMAGE_RE.test(f))) {
+		for (const f of fs
+			.readdirSync(aboutDir)
+			.filter((f) => IMAGE_RE.test(f) || STATIC_FILE_RE.test(f))) {
 			const src = path.join(aboutDir, f);
 			const dest = path.join(aboutDest, f);
 			const srcStat = fs.statSync(src);
@@ -99,7 +105,7 @@ async function main() {
 	console.log(`✓ Images processed in ${elapsed}ms`);
 }
 
-main().catch(err => {
+main().catch((err) => {
 	console.error('Image processing failed:', err);
 	process.exit(1);
 });

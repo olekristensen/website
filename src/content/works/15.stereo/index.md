@@ -40,12 +40,11 @@ appearances:
     place: Denmark
     url: null
 videos:
-  - id: "220616485"
+  - id: '220616485'
     title: 2D video documentation by Jan Vesala
 ---
 
 > STEREO is a powerful pertubation of the senses presented by award winning recoil performance group. A graphic universe in 3D and an intense duet between man and woman, between reality and illusion. With STEREO recoil performance group adds a new dimension to their frontiering video scenographies: Thus, the space around the dancers' bodies collapses and expands indefinitely; it curls up or slips off the stage tempting the audience to reach out.
-
 
 ## Concept & Motivation
 

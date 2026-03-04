@@ -39,7 +39,7 @@ appearances:
     place: Hippodromen, Folketeatret, Copenhagen
     url: null
 videos:
-  - id: "9098395"
+  - id: '9098395'
     title: Documentation of full performance by Tina Tarpgaard
 ---
 

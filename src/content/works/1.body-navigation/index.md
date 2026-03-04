@@ -54,9 +54,9 @@ appearances:
     place: Kaleidoskop K2, Copenhagen
     url: null
 videos:
-  - id: "1362832"
+  - id: '1362832'
     title: Trailer by Tina Tarpgaard
-  - id: "2449078"
+  - id: '2449078'
     title: Documentation of full performance by Ole Kristensen
 ---
 

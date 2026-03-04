@@ -34,7 +34,7 @@ appearances:
     place: Kulturværftet, Elsinore
     url: http://clickfestival.dk/
 videos:
-  - id: "220614020"
+  - id: '220614020'
     title: 2D video documentation by Maria Paula Saba
 ---
 

@@ -29,13 +29,13 @@ appearances:
     place: Dansehallerne, Copenhagen
     url: http://dansehallerne.dk
 videos:
-  - id: "20597987"
+  - id: '20597987'
     title: Trailer by Søren Meisner
-  - id: "27236991"
+  - id: '27236991'
     title: Full performance documentation by Recoil Performance Group
 ---
 
-With an outset in interview material this performance was a departure from our earlier works in Recoil Performance Group. 
+With an outset in interview material this performance was a departure from our earlier works in Recoil Performance Group.
 
 My role was to create the visual expression of scenes involving the recorded material as interpreted by the sound artist Pelle Skovmand. One of the elements were elastic sound-waves that would bend around the dancers. Another was a giant, mobile box with a plexiglass backprojection.
 

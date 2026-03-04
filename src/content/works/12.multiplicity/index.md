@@ -27,7 +27,7 @@ appearances:
     place: Fremtidens Borgerhus, Vallensbæk
     url: null
 videos:
-  - id: "89381283"
+  - id: '89381283'
     title: Development screencast
 ---
 

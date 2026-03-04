@@ -41,13 +41,13 @@ appearances:
     place: Science and Cocktails, Christiania
     url: http://www.in-transit.org/2012
 videos:
-  - id: "62051674"
+  - id: '62051674'
     title: Documentation of full performance by Ole Kristensen and Deborah Vlaeymans
 ---
 
-In january 2012 I travelled to the Yucatan peninsula with Deborah Vlaeymans. We brought along a 3D camera and a question for the Mayas: Did they believe the world would end on December 21st? The answer was fortunately no. 
+In january 2012 I travelled to the Yucatan peninsula with Deborah Vlaeymans. We brought along a 3D camera and a question for the Mayas: Did they believe the world would end on December 21st? The answer was fortunately no.
 
-Our travel and stereographic films formed the basis of a series of 3D music performances in Copenhagen. I created a mobile 3D cinema, that travelled the city on a cargo bike. 
+Our travel and stereographic films formed the basis of a series of 3D music performances in Copenhagen. I created a mobile 3D cinema, that travelled the city on a cargo bike.
 
 ## The Mobile 3D Cinema
 

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
 	--font-heading: 'Space Grotesk', sans-serif;
@@ -6,11 +6,11 @@
 	--font-serif: 'Lora', serif;
 	--color-surface: oklch(0.98 0.003 100);
 	--color-ink: oklch(0.12 0.01 260);
-	--color-ink-secondary: oklch(0.50 0.01 260);
-	--color-accent: oklch(0.75 0.30 150);
-	--color-accent-hover: oklch(0.70 0.35 150);
+	--color-ink-secondary: oklch(0.5 0.01 260);
+	--color-accent: oklch(0.75 0.3 150);
+	--color-accent-hover: oklch(0.7 0.35 150);
 	--color-accent-subtle: oklch(0.95 0.06 150);
-	--color-accent-duotone: oklch(0.75 0.30 150 / 0.35);
+	--color-accent-duotone: oklch(0.75 0.3 150 / 0.35);
 	--color-border: oklch(0.93 0.003 100);
 	--max-w: 1280px;
 	--gutter: clamp(1.5rem, 5vw, 4rem);
@@ -29,59 +29,61 @@ body {
 
 /* ===== Bureau / dark palette (whole-site domain switch) ===== */
 body.bureau {
-	--color-surface: oklch(0.30 0.012 270);
+	--color-surface: oklch(0.3 0.012 270);
 	--color-ink: oklch(0.93 0.005 260);
 	--color-ink-secondary: oklch(0.68 0.008 265);
 	--color-accent: oklch(0.91 0.35 100);
 	--color-accent-hover: oklch(0.95 0.38 100);
 	--color-accent-subtle: oklch(0.35 0.04 100);
 	--color-accent-duotone: oklch(0.91 0.35 100 / 0.3);
-	--color-border: oklch(0.37 0.010 270);
+	--color-border: oklch(0.37 0.01 270);
 	background: var(--color-surface);
 	color: var(--color-ink);
-	transition: background 0.5s ease, color 0.5s ease;
+	transition:
+		background 0.5s ease,
+		color 0.5s ease;
 }
 
 body.bureau footer {
-	--color-surface: oklch(0.30 0.012 270);
+	--color-surface: oklch(0.3 0.012 270);
 	--color-ink: oklch(0.93 0.005 260);
 	--color-ink-secondary: oklch(0.68 0.008 265);
 	--color-accent: oklch(0.91 0.35 100);
-	--color-border: oklch(0.37 0.010 270);
+	--color-border: oklch(0.37 0.01 270);
 }
 
 /* ===== Bureau / dark palette (per-page) ===== */
 .page-dark {
-	--color-surface: oklch(0.30 0.012 270);
+	--color-surface: oklch(0.3 0.012 270);
 	--color-ink: oklch(0.93 0.005 260);
 	--color-ink-secondary: oklch(0.68 0.008 265);
 	--color-accent: oklch(0.91 0.35 100);
 	--color-accent-hover: oklch(0.95 0.38 100);
 	--color-accent-subtle: oklch(0.35 0.04 100);
 	--color-accent-duotone: oklch(0.91 0.35 100 / 0.3);
-	--color-border: oklch(0.37 0.010 270);
+	--color-border: oklch(0.37 0.01 270);
 	background: var(--color-surface);
 	color: var(--color-ink);
 }
 
 /* Adapt footer when inside page-dark via :has (bureau pages) */
 body:has(.page-dark) footer {
-	--color-surface: oklch(0.30 0.012 270);
+	--color-surface: oklch(0.3 0.012 270);
 	--color-ink: oklch(0.93 0.005 260);
 	--color-ink-secondary: oklch(0.68 0.008 265);
 	--color-accent: oklch(0.91 0.35 100);
-	--color-border: oklch(0.37 0.010 270);
+	--color-border: oklch(0.37 0.01 270);
 }
 
 /* ===== Artist / light palette (per-page override) ===== */
 .page-light {
 	--color-surface: oklch(0.98 0.003 100);
 	--color-ink: oklch(0.12 0.01 260);
-	--color-ink-secondary: oklch(0.50 0.01 260);
-	--color-accent: oklch(0.75 0.30 150);
-	--color-accent-hover: oklch(0.70 0.35 150);
+	--color-ink-secondary: oklch(0.5 0.01 260);
+	--color-accent: oklch(0.75 0.3 150);
+	--color-accent-hover: oklch(0.7 0.35 150);
 	--color-accent-subtle: oklch(0.95 0.06 150);
-	--color-accent-duotone: oklch(0.75 0.30 150 / 0.35);
+	--color-accent-duotone: oklch(0.75 0.3 150 / 0.35);
 	--color-border: oklch(0.93 0.003 100);
 	background: var(--color-surface);
 	color: var(--color-ink);
@@ -91,8 +93,8 @@ body:has(.page-dark) footer {
 body:has(.page-light) footer {
 	--color-surface: oklch(0.98 0.003 100);
 	--color-ink: oklch(0.12 0.01 260);
-	--color-ink-secondary: oklch(0.50 0.01 260);
-	--color-accent: oklch(0.75 0.30 150);
+	--color-ink-secondary: oklch(0.5 0.01 260);
+	--color-accent: oklch(0.75 0.3 150);
 	--color-border: oklch(0.93 0.003 100);
 }
 
@@ -104,8 +106,14 @@ body:has(.page-light) footer {
 		animation-range: entry 0% entry 35%;
 	}
 	@keyframes fadeSlideUp {
-		from { opacity: 0; transform: translateY(1.5rem); }
-		to { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(1.5rem);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 }
 
@@ -118,7 +126,10 @@ body:has(.page-light) footer {
 	max-width: 65ch;
 	font-weight: 400;
 }
-.prose h1, .prose h2, .prose h3, .prose h4 {
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
 	font-family: var(--font-heading);
 	font-weight: 600;
 	letter-spacing: -0.02em;
@@ -126,18 +137,32 @@ body:has(.page-light) footer {
 	margin-top: 2em;
 	margin-bottom: 0.5em;
 }
-.prose h2 { font-size: 1.5rem; }
-.prose h3 { font-size: 1.2rem; }
-.prose p { margin-bottom: 1em; }
+.prose h2 {
+	font-size: 1.5rem;
+}
+.prose h3 {
+	font-size: 1.2rem;
+}
+.prose p {
+	margin-bottom: 1em;
+}
 .prose a {
 	color: var(--color-accent);
 	text-decoration: underline;
 	text-underline-offset: 3px;
 	transition: color 0.2s;
 }
-.prose a:hover { color: var(--color-accent-hover); }
-.prose ul, .prose ol { margin-bottom: 1em; padding-left: 1.5em; }
-.prose li { margin-bottom: 0.3em; }
+.prose a:hover {
+	color: var(--color-accent-hover);
+}
+.prose ul,
+.prose ol {
+	margin-bottom: 1em;
+	padding-left: 1.5em;
+}
+.prose li {
+	margin-bottom: 0.3em;
+}
 .prose blockquote {
 	border-left: 3px solid var(--color-accent);
 	padding-left: 1.25rem;
@@ -145,8 +170,12 @@ body:has(.page-light) footer {
 	color: var(--color-ink-secondary);
 	font-style: italic;
 }
-.prose strong { font-weight: 500; }
-.prose em { font-style: italic; }
+.prose strong {
+	font-weight: 500;
+}
+.prose em {
+	font-style: italic;
+}
 
 /* ===== Hover-line underline animation ===== */
 .hover-line {
@@ -181,4 +210,3 @@ body:has(.page-light) footer {
 	max-height: 85vh;
 	object-fit: contain;
 }
-

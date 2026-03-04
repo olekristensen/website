@@ -22,7 +22,7 @@ github:
   repo: LongingFastForward
 photocredits: Ole Kristensen
 videos:
-  - id: "122337270"
+  - id: '122337270'
     title: Short edit from the 11 hour timelapse
 ---
 

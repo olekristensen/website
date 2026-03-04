@@ -36,9 +36,9 @@ appearances:
     place: Dansehallerne, Copenhagen
     url: http://www.dansescenen.dk/side.asp?side=1&id=503
 videos:
-  - id: "10865845"
+  - id: '10865845'
     title: Full performance documentation by Recoil Performance Group
-  - id: "8597947"
+  - id: '8597947'
     title: Trailer by Søren Meisner
 ---
 

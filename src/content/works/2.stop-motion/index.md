@@ -36,11 +36,11 @@ appearances:
     place: re:new festival, Copenhagen Main Square
     url: http://www.re-new.dk/2008/index.php?pid=57
 videos:
-  - id: "58663420"
+  - id: '58663420'
     title: Screengrab from Zirkulation Festival
-  - id: "2034999"
+  - id: '2034999'
     title: Documentation from Copenhagen Central Square by Jonas Jongejan
-  - id: "1943161"
+  - id: '1943161'
     title: Documentation from New Media Meeting 3 by Ole Kristensen
 ---
 

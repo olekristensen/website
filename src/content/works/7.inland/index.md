@@ -19,9 +19,9 @@ appearances:
     place: Dansehallerne, Copenhagen
     url: http://dansehallerne.dk
 videos:
-  - id: "17137609"
+  - id: '17137609'
     title: Installation excerpt
-  - id: "17403252"
+  - id: '17403252'
     title: Documentation by Ole Kristensen
 ---
 
