@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-	<title>Ole Kristensen — Software Artist & Design Technologist</title>
+	<title>{bureau ? 'Den Frie Vilje' : 'Ole Kristensen'} — Software Artist & Design Technologist</title>
 	<meta name="description" content="Interactive installations, live performances and design technology." />
 </svelte:head>
 

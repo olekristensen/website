@@ -1,11 +1,14 @@
 <script lang="ts">
    import type { PageData } from './$types';
    import VoronoiGlass from '$lib/components/VoronoiGlass.svelte';
+   import { getContext } from 'svelte';
    import SectionLabel from '$lib/components/SectionLabel.svelte';
    import PageTitle from '$lib/components/PageTitle.svelte';
    import type { ImageSrcSet } from '$lib/components/VoronoiGlass.svelte';
 
    let { data }: { data: PageData } = $props();
+   const getBureau = getContext<() => boolean>('bureau');
+   let bureau = $derived(getBureau ? getBureau() : false);
 
    // Single image srcset for VoronoiGlass
    const images: ImageSrcSet[] = [
@@ -20,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>About — Ole Kristensen</title>
+	<title>About — {bureau ? 'Den Frie Vilje' : 'Ole Kristensen'}</title>
 	<meta property="og:title" content="About" />
 </svelte:head>
 

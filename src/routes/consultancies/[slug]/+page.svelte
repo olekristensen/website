@@ -1,16 +1,19 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import VimeoPlayer from '$lib/components/VimeoPlayer.svelte';
+	import { getContext } from 'svelte';
 	import SectionLabel from '$lib/components/SectionLabel.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import CtaLink from '$lib/components/CtaLink.svelte';
 	import Gallery from '$lib/components/Gallery.svelte';
 
 	let { data }: { data: PageData } = $props();
+	const getBureau = getContext<() => boolean>('bureau');
+	let bureau = $derived(getBureau ? getBureau() : false);
 </script>
 
 <svelte:head>
-	<title>{data.item.meta.title || data.slug} — Ole Kristensen</title>
+	<title>{data.item.meta.title || data.slug} — {bureau ? 'Den Frie Vilje' : 'Ole Kristensen'}</title>
 	{#if data.item.meta.title}
 		<meta property="og:title" content={data.item.meta.title} />
 	{/if}

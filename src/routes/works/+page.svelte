@@ -1,15 +1,18 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import SectionLabel from '$lib/components/SectionLabel.svelte';
+	import { getContext } from 'svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import Tag from '$lib/components/Tag.svelte';
 	import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
 
 	let { data }: { data: PageData } = $props();
+	const getBureau = getContext<() => boolean>('bureau');
+	let bureau = $derived(getBureau ? getBureau() : false);
 </script>
 
 <svelte:head>
-	<title>Works — Ole Kristensen</title>
+	<title>Works — {bureau ? 'Den Frie Vilje' : 'Ole Kristensen'}</title>
 </svelte:head>
 
 <div class="page-light">
