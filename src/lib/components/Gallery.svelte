@@ -132,23 +132,23 @@
 		}}
 	>
 		<button
-			class="absolute right-4 top-4 z-10 text-3xl text-white/70 hover:text-white"
+			class="absolute right-4 top-4 z-20 text-3xl text-white/70 hover:text-white"
 			onclick={() => lightboxIndex = -1}
 			aria-label="Close"
 		>&times;</button>
 		{#if lightboxIndex > 0}
 			<button
-				class="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-4xl text-white/50 hover:text-white"
+				class="group/nav absolute left-0 top-0 z-10 flex h-full w-1/5 cursor-pointer items-center justify-start pl-4"
 				onclick={(e) => { e.stopPropagation(); goTo(lightboxIndex - 1); }}
 				aria-label="Previous"
-			>&lsaquo;</button>
+			><span class="text-4xl text-white/50 group-hover/nav:text-white">&lsaquo;</span></button>
 		{/if}
 		{#if lightboxIndex < images.length - 1}
 			<button
-				class="absolute right-4 top-1/2 z-10 -translate-y-1/2 text-4xl text-white/50 hover:text-white"
+				class="group/nav absolute right-0 top-0 z-10 flex h-full w-1/5 cursor-pointer items-center justify-end pr-4"
 				onclick={(e) => { e.stopPropagation(); goTo(lightboxIndex + 1); }}
 				aria-label="Next"
-			>&rsaquo;</button>
+			><span class="text-4xl text-white/50 group-hover/nav:text-white">&rsaquo;</span></button>
 		{/if}
 		<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 		<div
