@@ -12,8 +12,10 @@ import sharp from 'sharp';
 const CONTENT_DIR = path.join(process.cwd(), 'src', 'content');
 const OUTPUT_DIR = path.join(process.cwd(), 'static', 'content');
 const THUMB_WIDTH = 480;
+const THUMB_SIZES = [480, 960, 1920];
 const THUMB_QUALITY = 75;
 const IMAGE_RE = /\.(jpg|jpeg|png|gif|webp)$/i;
+const DOCUMENT_RE = /\.(pdf|svg|doc|docx|txt|rtf|odt|epub)$/i;
 const THUMB_RE = /^(thumb|00\.thumb)\.(jpg|jpeg|png|gif|webp)$/i;
 
 function extractSlug(dirname) {
@@ -36,9 +38,20 @@ async function processSection(section) {
 		const destDir = path.join(OUTPUT_DIR, section, slug);
 
 		const files = fs.readdirSync(srcDir).filter((f) => IMAGE_RE.test(f));
-		if (files.length === 0) continue;
+		const docs = fs.readdirSync(srcDir).filter((f) => DOCUMENT_RE.test(f));
+		if (files.length === 0 && docs.length === 0) continue;
 
 		fs.mkdirSync(destDir, { recursive: true });
+
+		// Copy documents (no thumbnail processing)
+		for (const doc of docs) {
+			const srcPath = path.join(srcDir, doc);
+			const destPath = path.join(destDir, doc);
+			const srcStat = fs.statSync(srcPath);
+			if (!fs.existsSync(destPath) || fs.statSync(destPath).mtimeMs < srcStat.mtimeMs) {
+				fs.copyFileSync(srcPath, destPath);
+			}
+		}
 
 		for (const file of files) {
 			const srcPath = path.join(srcDir, file);
@@ -50,22 +63,23 @@ async function processSection(section) {
 				fs.copyFileSync(srcPath, destPath);
 			}
 
-			// Generate scaled thumbnail for thumb images
+			// Generate scaled thumbnails at all sizes
 			if (THUMB_RE.test(file)) {
 				const ext = path.extname(file);
-				const thumbDest = path.join(destDir, `thumb-${THUMB_WIDTH}${ext}`);
-				if (!fs.existsSync(thumbDest) || fs.statSync(thumbDest).mtimeMs < srcStat.mtimeMs) {
-					try {
-						await sharp(srcPath)
-							.resize(THUMB_WIDTH, null, { withoutEnlargement: true })
-							.jpeg({ quality: THUMB_QUALITY, mozjpeg: true })
-							.toFile(thumbDest.replace(ext, '.jpg'));
-						// If the source wasn't .jpg, also write with .jpg ext
-					} catch (err) {
-						console.warn(
-							`  ⚠ Failed to generate thumb for ${section}/${slug}/${file}:`,
-							err.message
-						);
+				for (const size of THUMB_SIZES) {
+					const thumbDest = path.join(destDir, `thumb-${size}.jpg`);
+					if (!fs.existsSync(thumbDest) || fs.statSync(thumbDest).mtimeMs < srcStat.mtimeMs) {
+						try {
+							await sharp(srcPath)
+								.resize(size, null, { withoutEnlargement: true })
+								.jpeg({ quality: THUMB_QUALITY, mozjpeg: true })
+								.toFile(thumbDest);
+						} catch (err) {
+							console.warn(
+								`  ⚠ Failed to generate thumb-${size} for ${section}/${slug}/${file}:`,
+								err.message
+							);
+						}
 					}
 				}
 			}
@@ -88,7 +102,7 @@ async function main() {
 	if (fs.existsSync(aboutDir)) {
 		const aboutDest = path.join(OUTPUT_DIR, 'about');
 		fs.mkdirSync(aboutDest, { recursive: true });
-		for (const f of fs.readdirSync(aboutDir).filter((f) => IMAGE_RE.test(f))) {
+		for (const f of fs.readdirSync(aboutDir).filter((f) => IMAGE_RE.test(f) || DOCUMENT_RE.test(f))) {
 			const src = path.join(aboutDir, f);
 			const dest = path.join(aboutDest, f);
 			const srcStat = fs.statSync(src);
