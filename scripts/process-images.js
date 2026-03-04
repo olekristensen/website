@@ -102,7 +102,9 @@ async function main() {
 	if (fs.existsSync(aboutDir)) {
 		const aboutDest = path.join(OUTPUT_DIR, 'about');
 		fs.mkdirSync(aboutDest, { recursive: true });
-		for (const f of fs.readdirSync(aboutDir).filter((f) => IMAGE_RE.test(f) || DOCUMENT_RE.test(f))) {
+		for (const f of fs
+			.readdirSync(aboutDir)
+			.filter((f) => IMAGE_RE.test(f) || DOCUMENT_RE.test(f))) {
 			const src = path.join(aboutDir, f);
 			const dest = path.join(aboutDest, f);
 			const srcStat = fs.statSync(src);
