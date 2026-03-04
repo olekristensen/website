@@ -110,10 +110,6 @@
 	let mouseOverCanvas = false;
 	let dirX = 0, dirY = 0;
 
-	// Device orientation
-	let deviceTiltX = 0, deviceTiltY = 0;
-	let prevBeta: number | null = null, prevGamma: number | null = null;
-
 	// Drag / click
 	let pointerDown = false;
 	let pointerDownX = 0, pointerDownY = 0;
@@ -425,22 +421,6 @@
 		touchIsDragging = false;
 	}
 
-	function setupDeviceOrientation() {
-		window.addEventListener('deviceorientation', (e) => {
-			const gamma = e.gamma || 0;
-			const beta = e.beta || 0;
-			if (prevBeta !== null && prevGamma !== null) {
-				const dg = Math.abs(gamma - prevGamma);
-				const db = Math.abs(beta - prevBeta);
-				if (dg > 0.4 || db > 0.4) lastStimulusTime = performance.now();
-			}
-			deviceTiltX = Math.max(-1, Math.min(1, gamma / 30));
-			deviceTiltY = Math.max(-1, Math.min(1, (beta - 45) / 30));
-			prevGamma = gamma;
-			prevBeta = beta;
-		});
-	}
-
 	// ===== Activity =====
 	function updateActivity(now: number) {
 		const timeSinceStimulus = now - lastStimulusTime;
@@ -473,11 +453,6 @@
 				}
 			}
 
-			if (stimulusActive && (Math.abs(deviceTiltX) > 0.05 || Math.abs(deviceTiltY) > 0.05)) {
-				const tiltMag = Math.sqrt(deviceTiltX * deviceTiltX + deviceTiltY * deviceTiltY);
-				targetActivity = Math.max(targetActivity, Math.min(1, tiltMag));
-			}
-
 			if (waveCursorActive) {
 				const cdx = seeds[i].x - waveOriginX;
 				const cdy = seeds[i].y - waveOriginY;
@@ -507,13 +482,8 @@
 		canvasMouseY = pageMouseY - rect.top;
 		mouseOverCanvas = canvasMouseX >= 0 && canvasMouseX <= W && canvasMouseY >= 0 && canvasMouseY <= H;
 
-		if (Math.abs(deviceTiltX) > 0.05 || Math.abs(deviceTiltY) > 0.05) {
-			dirX = deviceTiltX;
-			dirY = deviceTiltY;
-		} else {
-			dirX *= 0.95;
-			dirY *= 0.95;
-		}
+		dirX *= 0.95;
+		dirY *= 0.95;
 
 		for (let i = 0; i < baseSeeds.length; i++) {
 			const bx = baseSeeds[i].x, by = baseSeeds[i].y;
@@ -1120,23 +1090,6 @@
 			tmpCtx.fillRect(0, 0, 1, 1);
 			const [r, g, b] = tmpCtx.getImageData(0, 0, 1, 1).data;
 			resolvedGridColor = `${r}, ${g}, ${b}`;
-		}
-
-		// Device orientation
-		if (typeof DeviceOrientationEvent !== 'undefined' &&
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-			const handler = async () => {
-				try {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					const perm = await (DeviceOrientationEvent as any).requestPermission();
-					if (perm === 'granted') setupDeviceOrientation();
-				// eslint-disable-next-line no-empty
-				} catch {}
-			};
-			document.addEventListener('click', handler, { once: true });
-		} else if (typeof DeviceOrientationEvent !== 'undefined') {
-			setupDeviceOrientation();
 		}
 
 		// Global event listeners
