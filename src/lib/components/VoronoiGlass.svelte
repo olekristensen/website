@@ -979,6 +979,7 @@
 	function resize() {
 		if (!containerEl || !canvasEl) return;
 		const rect = containerEl.getBoundingClientRect();
+		const prevW = W, prevH = H;
 		W = rect.width;
 		H = rect.height;
 		if (W === 0 || H === 0) return;
@@ -987,11 +988,26 @@
 		canvasEl.style.width = W + 'px';
 		canvasEl.style.height = H + 'px';
 		ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-		generateSeeds();
-		seeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
-		targetSeeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
-		generateRefractions();
-		cellDragReveal = new Array(cellCount).fill(0);
+
+		if (baseSeeds.length === cellCount && prevW > 0 && prevH > 0) {
+			// Scale existing seeds proportionally — avoids flicker on mobile resize
+			const sx = W / prevW, sy = H / prevH;
+			for (let i = 0; i < baseSeeds.length; i++) {
+				baseSeeds[i].x *= sx;
+				baseSeeds[i].y *= sy;
+				seeds[i].x *= sx;
+				seeds[i].y *= sy;
+				targetSeeds[i].x *= sx;
+				targetSeeds[i].y *= sy;
+			}
+		} else {
+			generateSeeds();
+			seeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
+			targetSeeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
+			generateRefractions();
+			cellDragReveal = new Array(cellCount).fill(0);
+		}
+
 		recomputePolys();
 		computeAdjacency();
 		checkResolutionChange();

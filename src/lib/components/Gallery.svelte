@@ -9,6 +9,22 @@
 	let lightboxIndex = $state(-1);
 	let overlayEl: HTMLDivElement | undefined = $state();
 
+	let touchStartX = 0;
+	let touchStartY = 0;
+
+	function handleTouchStart(e: TouchEvent) {
+		touchStartX = e.touches[0].clientX;
+		touchStartY = e.touches[0].clientY;
+	}
+
+	function handleTouchEnd(e: TouchEvent) {
+		const dx = e.changedTouches[0].clientX - touchStartX;
+		const dy = e.changedTouches[0].clientY - touchStartY;
+		if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+		if (dx < 0 && lightboxIndex < images.length - 1) lightboxIndex++;
+		else if (dx > 0 && lightboxIndex > 0) lightboxIndex--;
+	}
+
 	$effect(() => {
 		if (lightboxIndex >= 0 && overlayEl) {
 			overlayEl.focus();
@@ -47,6 +63,8 @@
 		aria-modal="true"
 		tabindex="-1"
 		onclick={() => lightboxIndex = -1}
+		ontouchstart={handleTouchStart}
+		ontouchend={handleTouchEnd}
 		onkeydown={(e) => {
 			if (e.key === 'Escape') lightboxIndex = -1;
 			if (e.key === 'ArrowRight' && lightboxIndex < images.length - 1) lightboxIndex++;
