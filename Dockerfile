@@ -22,7 +22,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy static build output
 COPY --from=build /app/build /usr/share/nginx/html
 
-EXPOSE 8080
+EXPOSE 7777
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
   CMD wget -qO /dev/null http://localhost:8080/ || exit 1
