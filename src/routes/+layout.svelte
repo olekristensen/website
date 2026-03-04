@@ -11,7 +11,7 @@
 	setContext('bureau', () => bureau);
 
 	onMount(() => {
-		if (window.location.hostname === 'denfrievilje.dk') {
+		if (window.location.hostname.endsWith('denfrievilje.dk')) {
 			handleToggleDomain('bureau');
 		}
 	});
