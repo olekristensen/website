@@ -16,6 +16,16 @@ export default ts.config(
 		}
 	},
 	{
+		rules: {
+			// Trusted markdown content rendered via {@html} from filesystem
+			'svelte/no-at-html-tags': 'off',
+			// Static adapter — all routes prerendered, no need for resolve()
+			'svelte/no-navigation-without-resolve': 'off',
+			// Simple array iterations throughout — keys not needed for static content
+			'svelte/require-each-key': 'off'
+		}
+	},
+	{
 		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
 		languageOptions: {
 			parserOptions: {
@@ -24,6 +34,13 @@ export default ts.config(
 		}
 	},
 	{
-		ignores: ['build/', '.svelte-kit/', 'dist/', '.agents/', 'pnpm-lock.yaml']
+		ignores: [
+			'build/',
+			'.svelte-kit/',
+			'dist/',
+			'.agents/',
+			'pnpm-lock.yaml',
+			'scripts/migrate-content.js'
+		]
 	}
 );

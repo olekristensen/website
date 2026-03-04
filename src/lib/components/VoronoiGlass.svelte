@@ -69,7 +69,7 @@
 	const ACTIVITY_ATTACK = 0.08;
 	const ACTIVITY_DECAY = 0.012;
 	const ACTIVITY_GRACE = 150;
-	const WAVE_TOUCH_DURATION = 500;
+	const _WAVE_TOUCH_DURATION = 500; // eslint-disable-line @typescript-eslint/no-unused-vars
 	const DRAG_THRESHOLD = 6;
 	const DRAG_FADE_SPEED = 0.06;
 
@@ -254,7 +254,7 @@
 				grid[`${Math.floor(x / step)},${Math.floor(y / step)}`] = minI;
 			}
 		}
-		const pairs = new Set<string>();
+		const pairs = new Set<string>(); // eslint-disable-line svelte/prefer-svelte-reactivity
 		for (let y = 0; y < H; y += step) {
 			for (let x = 0; x < W; x += step) {
 				const gx = Math.floor(x / step), gy = Math.floor(y / step);
@@ -857,7 +857,6 @@
 		const gc = resolvedGridColor;
 
 		// Draw all Delaunay edges, fading by distance from cursor
-		const drawn = new Set<string>();
 		for (let i = 0; i < seeds.length; i++) {
 			for (const j of adjacency[i]) {
 				if (j <= i) continue; // each edge once
@@ -1109,11 +1108,14 @@
 
 		// Device orientation
 		if (typeof DeviceOrientationEvent !== 'undefined' &&
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
 			const handler = async () => {
 				try {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					const perm = await (DeviceOrientationEvent as any).requestPermission();
 					if (perm === 'granted') setupDeviceOrientation();
+				// eslint-disable-next-line no-empty
 				} catch {}
 			};
 			document.addEventListener('click', handler, { once: true });

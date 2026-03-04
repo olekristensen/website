@@ -11,7 +11,6 @@ import sharp from 'sharp';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src', 'content');
 const OUTPUT_DIR = path.join(process.cwd(), 'static', 'content');
-const THUMB_WIDTH = 480;
 const THUMB_SIZES = [480, 960, 1920];
 const THUMB_QUALITY = 75;
 const IMAGE_RE = /\.(jpg|jpeg|png|gif|webp)$/i;
@@ -65,7 +64,6 @@ async function processSection(section) {
 
 			// Generate scaled thumbnails at all sizes
 			if (THUMB_RE.test(file)) {
-				const ext = path.extname(file);
 				for (const size of THUMB_SIZES) {
 					const thumbDest = path.join(destDir, `thumb-${size}.jpg`);
 					if (!fs.existsSync(thumbDest) || fs.statSync(thumbDest).mtimeMs < srcStat.mtimeMs) {

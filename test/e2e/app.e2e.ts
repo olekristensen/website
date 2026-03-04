@@ -10,7 +10,7 @@ async function waitForServer(port: number, timeout = 30000) {
 		try {
 			const res = await fetch(`http://localhost:${port}/`, { method: 'GET' });
 			if (res.status < 500) return;
-		} catch (e) {
+		} catch {
 			// ignore
 		}
 		await new Promise((r) => setTimeout(r, 250));

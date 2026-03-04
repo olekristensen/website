@@ -16,7 +16,7 @@ export interface ContentMeta {
 	technologies?: string[];
 	appearances?: Array<{ date: string; occasion: string; place: string; url: string }>;
 	videos?: Array<{ id: string; title: string }>;
-	[key: string]: any;
+	[key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export interface ContentImages {
