@@ -3,6 +3,7 @@
 	import SectionLabel from '$lib/components/SectionLabel.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import Tag from '$lib/components/Tag.svelte';
+	import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
 
 	let { data }: { data: PageData } = $props();
 </script>
@@ -39,16 +40,14 @@
 					{#each group.items as item (item.slug)}
 						<a href="/works/{item.slug}" class="group block no-underline">
 							{#if item.images.thumb}
-								<div class="mb-3 aspect-[4/3] overflow-hidden bg-[var(--color-accent-subtle)]">
-									<img
-										src={item.images.thumb.replace('thumb-480.jpg', 'thumb-960.jpg')}
-										srcset="{item.images.thumb} 480w, {item.images.thumb.replace('thumb-480.jpg', 'thumb-960.jpg')} 960w"
-										sizes="100vw"
-										alt={item.meta.title || item.slug}
-										loading="lazy"
-										class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-									/>
-								</div>
+								<ResponsiveImage
+									src={item.images.thumb}
+									srcset={item.images.thumbSrcset}
+									sizes="100vw"
+									alt={item.meta.title || item.slug}
+									class="mb-3 aspect-[4/3] bg-[var(--color-accent-subtle)]"
+									innerClass="transition-transform duration-500 group-hover:scale-[1.04]"
+								/>
 							{/if}
 							<h3 class="mb-0.5 font-heading text-[1rem] font-medium tracking-tight">{item.meta.title || item.slug}</h3>
 							{#if item.meta.lead}
@@ -75,16 +74,14 @@
 								{/if}
 							</div>
 							{#if item.images.thumb}
-								<div class="aspect-square overflow-hidden bg-[var(--color-accent-subtle)]">
-									<img
-										src={item.images.thumb.replace('thumb-480.jpg', 'thumb-960.jpg')}
-										srcset="{item.images.thumb} 480w, {item.images.thumb.replace('thumb-480.jpg', 'thumb-960.jpg')} 960w"
-										sizes="16rem"
-										alt={item.meta.title || item.slug}
-										loading="lazy"
-										class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-									/>
-								</div>
+								<ResponsiveImage
+									src={item.images.thumb}
+									srcset={item.images.thumbSrcset}
+									sizes="16rem"
+									alt={item.meta.title || item.slug}
+									class="aspect-square bg-[var(--color-accent-subtle)]"
+									innerClass="transition-transform duration-500 group-hover:scale-[1.04]"
+								/>
 							{/if}
 							<div>
 							<h3 class="mb-0.5 font-heading text-[1rem] font-medium tracking-tight">{item.meta.title || item.slug}</h3>

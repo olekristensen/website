@@ -24,6 +24,8 @@ export interface ContentImages {
 	gallery: string[];
 	/** Scaled thumbnail URL (thumb-480.jpg), or null */
 	thumb: string | null;
+	/** srcset string for all available thumb sizes */
+	thumbSrcset: string | null;
 }
 
 export interface Content {
@@ -75,11 +77,22 @@ function resolveImages(section: string, slug: string, folder: string): ContentIm
 	// Gallery = everything that isn't a thumb
 	const gallery = allFiles.filter((f) => !THUMB_RE.test(f)).map((f) => `${publicBase}/${f}`);
 
-	// Thumb: check for generated thumb-480.jpg in static/content
+	// Thumb: check for generated thumbnails in static/content
 	const thumbPath = path.join(process.cwd(), 'static', 'content', section, slug, 'thumb-480.jpg');
 	const thumb = fs.existsSync(thumbPath) ? `${publicBase}/thumb-480.jpg` : null;
 
-	return { gallery, thumb };
+	// Build srcset from available thumb sizes
+	const thumbSizes = [480, 960, 1920];
+	const srcsetParts: string[] = [];
+	for (const size of thumbSizes) {
+		const p = path.join(process.cwd(), 'static', 'content', section, slug, `thumb-${size}.jpg`);
+		if (fs.existsSync(p)) {
+			srcsetParts.push(`${publicBase}/thumb-${size}.jpg ${size}w`);
+		}
+	}
+	const thumbSrcset = srcsetParts.length > 0 ? srcsetParts.join(', ') : null;
+
+	return { gallery, thumb, thumbSrcset };
 }
 
 /**
@@ -148,7 +161,7 @@ export async function getContent(section: string, slug: string): Promise<Content
 			meta,
 			html,
 			slug: extractSlug(section),
-			images: { gallery: [], thumb: null }
+			images: { gallery: [], thumb: null, thumbSrcset: null }
 		};
 	}
 

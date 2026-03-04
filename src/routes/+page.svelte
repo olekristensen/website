@@ -3,6 +3,7 @@
 	import SectionLabel from '$lib/components/SectionLabel.svelte';
 	import CtaLink from '$lib/components/CtaLink.svelte';
 	import DuotoneImage from '$lib/components/DuotoneImage.svelte';
+	import ResponsiveImage from '$lib/components/ResponsiveImage.svelte';
 	import type { PageData } from './$types';
 	import { getContext } from 'svelte';
 
@@ -35,17 +36,17 @@
 
 		<div class="grid grid-cols-1 gap-6 md:grid-cols-[1.3fr_0.7fr]">
 			{#each data.featured as work, i (work.slug)}
-				{#if i === 0}
+			{#if i === 0}
 					<a href="/works/{work.slug}" class="group block no-underline">
 						{#if work.images.thumb}
-							<div class="mb-4 aspect-[16/10] overflow-hidden bg-[var(--color-accent-subtle)]">
-								<img
-									src={work.images.thumb}
-									alt={work.meta.title}
-									loading="lazy"
-									class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-								/>
-							</div>
+							<ResponsiveImage
+								src={work.images.thumb}
+								srcset={work.images.thumbSrcset}
+								sizes="(min-width: 768px) 60vw, 100vw"
+								alt={work.meta.title}
+								class="mb-4 aspect-[16/10] bg-[var(--color-accent-subtle)]"
+								innerClass="transition-transform duration-500 group-hover:scale-[1.04]"
+							/>
 						{/if}
 						<h3 class="mb-1 font-heading text-[1.1rem] font-medium tracking-tight">{work.meta.title}</h3>
 						{#if work.meta.date}
@@ -60,16 +61,16 @@
 
 			<div class="flex flex-col gap-6">
 				{#each data.featured.slice(1, 3) as work (work.slug)}
-					<a href="/works/{work.slug}" class="group block no-underline">
+				<a href="/works/{work.slug}" class="group block no-underline">
 						{#if work.images.thumb}
-							<div class="mb-4 aspect-[4/3] overflow-hidden bg-[var(--color-accent-subtle)]">
-								<img
-									src={work.images.thumb}
-									alt={work.meta.title}
-									loading="lazy"
-									class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-								/>
-							</div>
+							<ResponsiveImage
+								src={work.images.thumb}
+								srcset={work.images.thumbSrcset}
+								sizes="(min-width: 768px) 30vw, 100vw"
+								alt={work.meta.title}
+								class="mb-4 aspect-[4/3] bg-[var(--color-accent-subtle)]"
+								innerClass="transition-transform duration-500 group-hover:scale-[1.04]"
+							/>
 						{/if}
 						<h3 class="mb-1 font-heading text-[1.1rem] font-medium tracking-tight">{work.meta.title}</h3>
 						{#if work.meta.date}
@@ -103,7 +104,7 @@
 			{#each data.consultancies.slice(0, 4) as consultancy (consultancy.slug)}
 				<a href="/consultancies/{consultancy.slug}" class="group grid grid-cols-[1fr_auto] items-center gap-6 border-b border-[var(--color-border)] px-0 py-5 no-underline transition-[padding-left] duration-300 first:border-t hover:pl-2 md:grid-cols-[5rem_1fr_auto]">
 					{#if consultancy.images?.thumb}
-					<DuotoneImage src={consultancy.images.thumb} class="hidden h-14 w-20 shrink-0 overflow-hidden md:block" />
+					<DuotoneImage src={consultancy.images.thumb} srcset={consultancy.images.thumbSrcset} sizes="5rem" class="hidden h-14 w-20 shrink-0 overflow-hidden md:block" />
 					{/if}
 					<div>
 						<h3 class="mb-0.5 font-heading text-[1.1rem] font-medium tracking-tight">{consultancy.meta.title}</h3>
