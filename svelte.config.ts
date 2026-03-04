@@ -9,6 +9,9 @@ const config: Config = {
 			fallback: 'index.html',
 			strict: false
 		}),
+		paths: {
+			relative: false
+		},
 		prerender: {
 			handleHttpError: ({ path }) => {
 				if (path === '/favicon.png') return;
