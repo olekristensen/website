@@ -28,7 +28,7 @@ appearances:
     place: Kulturværftet, Elsinore
     url: http://clickfestival.dk/
 videos:
-  - id: "108403341"
+  - id: '108403341'
     title: Video documentation by Johan Bichel Lindegaard
 ---
 

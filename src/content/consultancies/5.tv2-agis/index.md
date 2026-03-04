@@ -13,7 +13,7 @@ partners: TV 2 Marketing, Johan Bichel Lindegaard
 client: TV 2 Danmark
 photocredits: Copyright 2023 TV 2 Danmark.
 videos:
-  - id: "817280703"
+  - id: '817280703'
     title: Reel - Copyright 2022 TV 2 Danmark
 ---
 

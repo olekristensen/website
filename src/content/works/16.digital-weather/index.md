@@ -25,7 +25,7 @@ appearances:
     place: Vandalorum, Värnamo
     url: http://www.vandalorum.se/sv/ljus-är-en-rättighet-65-2210-2017/
 videos:
-  - id: "218380497"
+  - id: '218380497'
     title: Video documentation by Ole Kristensen
 ---
 

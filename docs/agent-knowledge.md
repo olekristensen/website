@@ -51,11 +51,11 @@ Both flavours share typography, layout grid, animation system, and interaction p
 
 Two CSS mechanisms, defined in `src/app.css`:
 
-| Mechanism | Selector | When used |
-|-----------|----------|-----------|
-| **Whole-site** | `body.bureau` | Toggled via JS in `+layout.svelte`; switches the entire page including footer |
-| **Per-page** | `.page-dark` wrapper div | Used on consultancies list + detail pages when in artist mode |
-| **Footer adaptation** | `body:has(.page-dark) footer` | CSS `:has()` auto-adapts footer when a `.page-dark` section is present |
+| Mechanism             | Selector                      | When used                                                                     |
+| --------------------- | ----------------------------- | ----------------------------------------------------------------------------- |
+| **Whole-site**        | `body.bureau`                 | Toggled via JS in `+layout.svelte`; switches the entire page including footer |
+| **Per-page**          | `.page-dark` wrapper div      | Used on consultancies list + detail pages when in artist mode                 |
+| **Footer adaptation** | `body:has(.page-dark) footer` | CSS `:has()` auto-adapts footer when a `.page-dark` section is present        |
 
 In development, a floating domain toggle (bottom-right) lets switching between artist/bureau modes.
 
@@ -63,36 +63,36 @@ In development, a floating domain toggle (bottom-right) lets switching between a
 
 All colours in OKLCH colour space (extended P3 gamut for neon accents):
 
-| Token | Artist (default) | Bureau (`body.bureau` / `.page-dark`) |
-|-------|-------------------|---------------------------------------|
-| `--color-surface` | `oklch(0.98 0.003 100)` near-white | `oklch(0.30 0.012 270)` dark warm gray |
-| `--color-ink` | `oklch(0.12 0.01 260)` near-black | `oklch(0.93 0.005 260)` light |
-| `--color-ink-secondary` | `oklch(0.50 0.01 260)` | `oklch(0.68 0.008 265)` |
-| `--color-accent` | `oklch(0.75 0.30 150)` neon green | `oklch(0.91 0.35 100)` neon yellow |
-| `--color-accent-hover` | `oklch(0.70 0.35 150)` | `oklch(0.95 0.38 100)` |
-| `--color-accent-subtle` | `oklch(0.95 0.06 150)` | `oklch(0.35 0.04 100)` |
-| `--color-accent-duotone` | `oklch(0.75 0.30 150 / 0.35)` | `oklch(0.91 0.35 100 / 0.3)` |
-| `--color-border` | `oklch(0.93 0.003 100)` | `oklch(0.37 0.010 270)` |
+| Token                    | Artist (default)                   | Bureau (`body.bureau` / `.page-dark`)  |
+| ------------------------ | ---------------------------------- | -------------------------------------- |
+| `--color-surface`        | `oklch(0.98 0.003 100)` near-white | `oklch(0.30 0.012 270)` dark warm gray |
+| `--color-ink`            | `oklch(0.12 0.01 260)` near-black  | `oklch(0.93 0.005 260)` light          |
+| `--color-ink-secondary`  | `oklch(0.50 0.01 260)`             | `oklch(0.68 0.008 265)`                |
+| `--color-accent`         | `oklch(0.75 0.30 150)` neon green  | `oklch(0.91 0.35 100)` neon yellow     |
+| `--color-accent-hover`   | `oklch(0.70 0.35 150)`             | `oklch(0.95 0.38 100)`                 |
+| `--color-accent-subtle`  | `oklch(0.95 0.06 150)`             | `oklch(0.35 0.04 100)`                 |
+| `--color-accent-duotone` | `oklch(0.75 0.30 150 / 0.35)`      | `oklch(0.91 0.35 100 / 0.3)`           |
+| `--color-border`         | `oklch(0.93 0.003 100)`            | `oklch(0.37 0.010 270)`                |
 
 ### Layout Tokens
 
 Defined in `@theme` block in `src/app.css`:
 
-| Token | Value | Purpose |
-|-------|-------|---------|
-| `--max-w` | `1280px` | Max content width |
+| Token      | Value                      | Purpose                       |
+| ---------- | -------------------------- | ----------------------------- |
+| `--max-w`  | `1280px`                   | Max content width             |
 | `--gutter` | `clamp(1.5rem, 5vw, 4rem)` | Responsive horizontal padding |
-| `--nav-h` | `3.25rem` | Fixed header height |
+| `--nav-h`  | `3.25rem`                  | Fixed header height           |
 
 ### Typography
 
 Three font families loaded from Google Fonts in `src/app.html`:
 
-| Token | Family | Usage |
-|-------|--------|-------|
-| `--font-heading` | Space Grotesk | Headings, nav, labels, tags, UI text |
-| `--font-body` | DM Sans | Body text (weight 300, line-height 1.6) |
-| `--font-serif` | Lora | Prose / rendered markdown content |
+| Token            | Family        | Usage                                   |
+| ---------------- | ------------- | --------------------------------------- |
+| `--font-heading` | Space Grotesk | Headings, nav, labels, tags, UI text    |
+| `--font-body`    | DM Sans       | Body text (weight 300, line-height 1.6) |
+| `--font-serif`   | Lora          | Prose / rendered markdown content       |
 
 Section labels use a consistent pattern: uppercase `font-heading` at `0.68rem` with wide tracking in accent colour, placed above large headings.
 
@@ -179,15 +179,15 @@ Sections reorder based on mode: bureau shows consultancies first, artist shows w
 
 All hover effects use Tailwind utilities inline:
 
-| Effect | CSS / class | Where used |
-|--------|-------------|------------|
-| Underline grow | `.hover-line::after` width 0→100% | Links |
-| Image scale | `group-hover:scale-[1.04]` | Gallery thumbnails |
-| Row slide-in | `transition-[padding-left] hover:pl-2` | Consultancy + appearance list rows |
-| Arrow shift | `group-hover:translate-x-1` | List row arrows |
-| Gap expand | `transition-[gap] hover:gap-3` | "View all →" links |
-| Grayscale → colour | `grayscale → group-hover:grayscale-0` + duotone overlay fade | Consultancy thumbnails |
-| Nav link colour | `hover:text-[var(--color-accent)]` | Header links |
+| Effect             | CSS / class                                                  | Where used                         |
+| ------------------ | ------------------------------------------------------------ | ---------------------------------- |
+| Underline grow     | `.hover-line::after` width 0→100%                            | Links                              |
+| Image scale        | `group-hover:scale-[1.04]`                                   | Gallery thumbnails                 |
+| Row slide-in       | `transition-[padding-left] hover:pl-2`                       | Consultancy + appearance list rows |
+| Arrow shift        | `group-hover:translate-x-1`                                  | List row arrows                    |
+| Gap expand         | `transition-[gap] hover:gap-3`                               | "View all →" links                 |
+| Grayscale → colour | `grayscale → group-hover:grayscale-0` + duotone overlay fade | Consultancy thumbnails             |
+| Nav link colour    | `hover:text-[var(--color-accent)]`                           | Header links                       |
 
 ### Footer (`Footer.svelte`)
 
@@ -221,9 +221,9 @@ docker run -p 8080:8080 denfrievilje
 
 Two workflows in `.github/workflows/`:
 
-| File | Triggers | Steps |
-|------|----------|-------|
-| `ci.yml` | Push / PR to `main` | Install → Lint → Type-check → Build |
+| File         | Triggers                             | Steps                                                         |
+| ------------ | ------------------------------------ | ------------------------------------------------------------- |
+| `ci.yml`     | Push / PR to `main`                  | Install → Lint → Type-check → Build                           |
 | `docker.yml` | Push to `main` / version tags (`v*`) | Build & push Docker image to GitHub Container Registry (GHCR) |
 
 The Docker workflow tags images as `latest` (on main) and the Git tag (on version tags).

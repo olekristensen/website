@@ -29,6 +29,7 @@ Image processing (`scripts/process-images.js`) runs automatically before `dev` a
 ### Content System
 
 Content lives in `src/content/{section}/{N.slug}/index.md`:
+
 - Sections: `works/`, `consultancies/`, `about/`, `contact/`
 - Numeric prefix controls sort order (e.g. `17.oresund`) — stripped to derive URL slug
 - Images co-located alongside `index.md`, processed to `static/content/` at build time
@@ -38,12 +39,12 @@ See [docs/content-structure.md](docs/content-structure.md) for full details.
 
 ### Key Files
 
-| Path | Purpose |
-|------|---------|
-| `src/lib/content.ts` | Content API: `getContentList()`, `getContent()`, frontmatter parsing |
-| `src/app.css` | Tailwind `@theme` tokens, design system utilities |
-| `src/lib/components/` | Header, Footer, Hero, VimeoPlayer |
-| `scripts/process-images.js` | Image copy + thumbnail generation |
+| Path                        | Purpose                                                              |
+| --------------------------- | -------------------------------------------------------------------- |
+| `src/lib/content.ts`        | Content API: `getContentList()`, `getContent()`, frontmatter parsing |
+| `src/app.css`               | Tailwind `@theme` tokens, design system utilities                    |
+| `src/lib/components/`       | Header, Footer, Hero, VimeoPlayer                                    |
+| `scripts/process-images.js` | Image copy + thumbnail generation                                    |
 
 ### Route Pattern
 
@@ -82,10 +83,10 @@ docker run -p 8080:8080 denfrievilje
 
 ## CI/CD (GitHub Actions)
 
-| Workflow | File | Triggers |
-|----------|------|----------|
-| CI | `.github/workflows/ci.yml` | Push/PR to `main` — install, lint, check, build |
-| Docker | `.github/workflows/docker.yml` | Push to `main` / `v*` tags — build & push to GHCR |
+| Workflow | File                           | Triggers                                          |
+| -------- | ------------------------------ | ------------------------------------------------- |
+| CI       | `.github/workflows/ci.yml`     | Push/PR to `main` — install, lint, check, build   |
+| Docker   | `.github/workflows/docker.yml` | Push to `main` / `v*` tags — build & push to GHCR |
 
 ## Svelte MCP Tools
 

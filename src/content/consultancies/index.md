@@ -1,5 +1,5 @@
 ---
-title: "Design<br /> Technology"
+title: 'Design<br /> Technology'
 label: Consultancies
 lead: "Mission\u2011critical software for real\u2011time graphics, interactives and cloud-native infrastructure."
 ---

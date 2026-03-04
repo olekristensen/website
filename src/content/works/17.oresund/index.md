@@ -27,7 +27,7 @@ appearances:
     place: DAC, Copenhagen
     url: https://dac.dk/udstillinger/ove-arup-the-philosophy-of-total-design/
 videos:
-  - id: "315770945"
+  - id: '315770945'
     title: Video documentation by Ole Kristensen
 ---
 
@@ -39,7 +39,7 @@ When the Victoria and Albert Museum exhibition 'Ove Arup & The Philosophy of Tot
 
 The concept was to try and build a particularily elegant part of the outrigger structure from the cable girders in 1:1 scale. The elegant outriggers enable the elegant harp shaped stay cables that have become a recognised design feature of the iconic bridge.
 
-The space itself was small and confined and we challenged ourselves to open it up with a ambient music composistion based on recordings of bridge traffic, sea and wind noise.  
+The space itself was small and confined and we challenged ourselves to open it up with a ambient music composistion based on recordings of bridge traffic, sea and wind noise.
 
 ## Technical Approach
 

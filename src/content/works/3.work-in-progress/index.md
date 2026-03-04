@@ -1,7 +1,7 @@
 ---
 title: Work in Progress
 date: April 2008
-lead: "Generative plotter drawings "
+lead: 'Generative plotter drawings '
 tags:
   - Installation
   - Arduino
@@ -50,11 +50,11 @@ appearances:
     place: Alt_Cph, Copenhagen
     url: http://altcph.dk/2008/
 videos:
-  - id: "14733478"
+  - id: '14733478'
     title: Trailer by Ole Kristensen
 ---
 
-Reviving an old Roland plotter, I programmed it to doodle in [Processing](https://processing.org). 
+Reviving an old Roland plotter, I programmed it to doodle in [Processing](https://processing.org).
 It took a few months, but it eventually ended up doodling the same way I do myself during long sedentary phone conversations.
 It has since been updated to run from an embedded Arduino chip.
 The complexity of the doodles is higher than I usually do them by hand and look slightly manic.
@@ -66,7 +66,6 @@ When stopped, it signs and numbers the drawing.
 The resulting sheet is sold as a unique pen drawing.
 
 The embedded version runs an Arduino sketch that sends [HPGL](https://en.wikipedia.org/wiki/HPGL) drawing commands to the plotter over serial. The generative doodling algorithm was originally written in [Processing](https://processing.org), then ported to run autonomously on the Arduino microcontroller.
-
 
 ## Acknowledgements
 

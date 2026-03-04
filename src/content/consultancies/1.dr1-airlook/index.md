@@ -13,11 +13,11 @@ partners: DR Design, Johan Bichel Lindegaard
 client: Danmarks Radio - Danish Broadcasting Corporation
 photocredits: Copyright 2018 Danish Broadcasting Corporations.
 videos:
-  - id: "298569964"
+  - id: '298569964'
     title: Copyright 2018 Danish Broadcasting Corporations
 ---
 
-DR1 is the flagship television channel of the Danish Broadcasting Corporation. It became Denmark’s first television station when it began broadcasting in 1951. 
+DR1 is the flagship television channel of the Danish Broadcasting Corporation. It became Denmark’s first television station when it began broadcasting in 1951.
 
 When DR1 got a new design, a new Airlook, I got involved in implementing the dynamic design ideas and helped migrating their custom Node.js/After Effects render farm to modern MacOS hardware.
 

@@ -7,9 +7,9 @@
 	let { data }: { data: PageData } = $props();
 	const getBureau = getContext<() => boolean>('bureau');
 	let bureau = $derived(getBureau ? getBureau() : false);
-	let mode = $derived(bureau ? 'bureau' : 'personal');
+	let mode = $derived(bureau ? 'bureau' : 'artist');
 
-	// Resolve bureau/personal variants — fields may be plain values or { bureau, personal } objects
+	// Resolve bureau/artist variants — fields may be plain values or { bureau, artist } objects
 	let address = $derived(
 		data.item.meta.address
 			? (Array.isArray(data.item.meta.address) ? data.item.meta.address : data.item.meta.address[mode])

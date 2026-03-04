@@ -12,7 +12,7 @@ He is driven by a playful urge to connect electronics, gadgets, visuals and movi
 
 In 2014 he was awarded a 2 year work grant from the <a href="http://www.kunst.dk/kunstomraader/scenekunst/nyheder/37-legater-er-blevet-uddelt-til-et-dynamisk-og-levende-scenekunstmiljoe/">Danish Arts Council</a> with the following motivation:
 
->[He] has a unique and original approach to all forms of time-based and digital media, placing him among the most interesting software artists in the world. Ole Kristensen is awarded a two-year work scholarship so he can concentrate on the creative study of digital, programmed and cross-aesthetic arts, and enjoy peace to navigate through the many artistic expressions that turn out.
+> [He] has a unique and original approach to all forms of time-based and digital media, placing him among the most interesting software artists in the world. Ole Kristensen is awarded a two-year work scholarship so he can concentrate on the creative study of digital, programmed and cross-aesthetic arts, and enjoy peace to navigate through the many artistic expressions that turn out.
 
 He is working in the dance company <a href="http://recoil-performance.org/">Recoil Performance Group</a> and the performance group <a href="http://in-transit.org">IN-TRANSIT</a>.
 
@@ -24,6 +24,6 @@ Selected exhibitions and performances include Click Festival (Elsinore), Renew F
 
 He was already working artisticly when he finished a BSc in Computer Science and Communications at Roskilde University in 2000. His projects had transformed into large scale immersive installations in the university's television studio. From there on he continued into visual arts, installation and performance via guest studies at the Art and Technology master at Chalmers University in Gothenburg and the Halfmachine festivals in Christiania.
 
->It is a great pleasure to create something that can react, adapt, and generate new forms from itself or it's surroundings. My main interest lies in this creation of dynamic aestetic phenomena. When an artwork is running software the challenge is to make the behavioural aspects of the piece constitute it's aestetic qualities.
+> It is a great pleasure to create something that can react, adapt, and generate new forms from itself or it's surroundings. My main interest lies in this creation of dynamic aestetic phenomena. When an artwork is running software the challenge is to make the behavioural aspects of the piece constitute it's aestetic qualities.
 >
 > – ole kristensen

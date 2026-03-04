@@ -2,13 +2,19 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import type { Snippet } from 'svelte';
-	import { setContext } from 'svelte';
+	import { setContext, onMount } from 'svelte';
 	import '../app.css';
 
 	let { children }: { children: Snippet } = $props();
 	let bureau = $state(false);
 
 	setContext('bureau', () => bureau);
+
+	onMount(() => {
+		if (window.location.hostname === 'denfrievilje.dk') {
+			handleToggleDomain('bureau');
+		}
+	});
 
 	function handleToggleDomain(mode: 'artist' | 'bureau') {
 		bureau = mode === 'bureau';
