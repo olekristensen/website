@@ -96,6 +96,11 @@
 	let seedDriftVelocities: { vx: number; vy: number }[] = [];
 	let driftActive = false;
 
+	// Initial settle wave (uses existing wave system, no image transition)
+	let settleWaveActive = false;
+	let settleWaveStart = 0;
+	const SETTLE_DAMPING = 0.03;
+
 	// Activity system
 	let activityLevel = 0;
 	let lastStimulusTime = 0;
@@ -236,14 +241,14 @@
 	}
 
 	function computeAdjacency() {
-		adjacency = seeds.map(() => []);
+		adjacency = baseSeeds.map(() => []);
 		const step = 4;
 		const grid: Record<string, number> = {};
 		for (let y = 0; y < H; y += step) {
 			for (let x = 0; x < W; x += step) {
 				let minD = Infinity, minI = 0;
-				for (let i = 0; i < seeds.length; i++) {
-					const dx = x - seeds[i].x, dy = y - seeds[i].y;
+				for (let i = 0; i < baseSeeds.length; i++) {
+					const dx = x - baseSeeds[i].x, dy = y - baseSeeds[i].y;
 					const d = dx * dx + dy * dy;
 					if (d < minD) { minD = d; minI = i; }
 				}
@@ -432,10 +437,30 @@
 			activityLevel = Math.max(0, activityLevel - ACTIVITY_DECAY);
 		}
 
-		const elapsed = transitioning ? now - transitionStart : 0;
 		if (transitioning) {
-			waveRadius = elapsed * waveSpeed;
+			waveRadius = (now - transitionStart) * waveSpeed;
 			waveCursorActive = true;
+		} else if (settleWaveActive) {
+			waveRadius = (now - settleWaveStart) * waveSpeed;
+			waveCursorActive = true;
+			// Once ring has passed all cells, wait for activity to decay naturally
+			const maxDist = Math.max(
+				Math.sqrt(waveOriginX ** 2 + waveOriginY ** 2),
+				Math.sqrt((W - waveOriginX) ** 2 + waveOriginY ** 2),
+				Math.sqrt(waveOriginX ** 2 + (H - waveOriginY) ** 2),
+				Math.sqrt((W - waveOriginX) ** 2 + (H - waveOriginY) ** 2)
+			);
+			if (waveRadius > maxDist + WAVE_RING_WIDTH) {
+				let allQuiet = true;
+				for (let i = 0; i < cellCount; i++) {
+					if (cellActivityLevels[i] > 0.005) { allQuiet = false; break; }
+				}
+				if (allQuiet) {
+					settleWaveActive = false;
+					waveCursorActive = false;
+					computeAdjacency();
+				}
+			}
 		} else {
 			waveCursorActive = false;
 		}
@@ -519,6 +544,7 @@
 		let moved = false;
 		const wrapThreshX = W * 0.4;
 		const wrapThreshY = H * 0.4;
+		const damping = settleWaveActive ? SETTLE_DAMPING : SEED_DAMPING;
 		for (let i = 0; i < seeds.length; i++) {
 			const dx = targetSeeds[i].x - seeds[i].x;
 			const dy = targetSeeds[i].y - seeds[i].y;
@@ -528,15 +554,17 @@
 				seeds[i].y = targetSeeds[i].y;
 				moved = true;
 			} else if (Math.abs(dx) > 0.02 || Math.abs(dy) > 0.02) {
-				seeds[i].x += dx * SEED_DAMPING;
-				seeds[i].y += dy * SEED_DAMPING;
+				seeds[i].x += dx * damping;
+				seeds[i].y += dy * damping;
 				moved = true;
 			} else {
 				seeds[i].x = targetSeeds[i].x;
 				seeds[i].y = targetSeeds[i].y;
 			}
 		}
-		if (moved) recomputePolys();
+		if (moved) {
+			recomputePolys();
+		}
 	}
 
 	function findCellAt(cx: number, cy: number) {
@@ -571,6 +599,12 @@
 
 	function triggerTransition() {
 		if (loadedImages.length < 2) return;
+
+		// If interrupting the settle wave, recompute adjacency from current positions
+		if (settleWaveActive) {
+			computeAdjacency();
+		}
+
 		fromIdx = currentIdx;
 		toIdx = (currentIdx + 1) % loadedImages.length;
 
@@ -605,6 +639,7 @@
 		}
 		transitioning = true;
 		transitionStart = performance.now();
+		settleWaveActive = false;
 		resetSlideshowTimer();
 		analyzeImageBrightness(loadedImages[toIdx]);
 		startSeedDrift();
@@ -802,7 +837,7 @@
 			cx = canvasMouseX;
 			cy = canvasMouseY;
 			active = true;
-		} else if (waveCursorActive) {
+		} else if (waveCursorActive && !settleWaveActive) {
 			cx = waveOriginX;
 			cy = waveOriginY;
 			active = true;
@@ -972,7 +1007,15 @@
 			}
 		} else {
 			generateSeeds();
-			seeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
+			// Offset seeds slightly from their relaxed positions and let them settle in
+			seeds = baseSeeds.map(s => {
+				const angle = Math.random() * Math.PI * 2;
+				const dist = 50 + Math.random() * 350;
+				return {
+					x: s.x + Math.cos(angle) * dist,
+					y: s.y + Math.sin(angle) * dist
+				};
+			});
 			targetSeeds = baseSeeds.map(s => ({ x: s.x, y: s.y }));
 			generateRefractions();
 			cellDragReveal = new Array(cellCount).fill(0);
@@ -1012,6 +1055,11 @@
 		if (total === 0) {
 			// Shading-only mode: no images, just animate cell overlays
 			ready = true;
+			// Fire settle wave so the grid animates in on load
+			settleWaveActive = true;
+			settleWaveStart = performance.now();
+			waveOriginX = Math.random() * W;
+			waveOriginY = Math.random() * H;
 			animFrame = requestAnimationFrame(mainLoop);
 			return;
 		}
@@ -1027,6 +1075,11 @@
 					ready = true;
 					analyzeImageBrightness(loadedImages[currentIdx]);
 					onready?.();
+					// Fire settle wave from a random position to animate the scattered seeds
+					settleWaveActive = true;
+					settleWaveStart = performance.now();
+					waveOriginX = Math.random() * W;
+					waveOriginY = Math.random() * H;
 					slideshowInterval = setInterval(triggerTransition, holdDuration);
 					animFrame = requestAnimationFrame(mainLoop);
 				}
