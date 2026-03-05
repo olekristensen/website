@@ -13,6 +13,11 @@
 	onMount(() => {
 		if (window.location.hostname.endsWith('denfrievilje.dk')) {
 			handleToggleDomain('bureau');
+		} else if (import.meta.env.DEV) {
+			const saved = localStorage.getItem('dev-domain-mode');
+			if (saved === 'bureau' || saved === 'artist') {
+				handleToggleDomain(saved);
+			}
 		}
 	});
 
@@ -20,6 +25,9 @@
 		bureau = mode === 'bureau';
 		if (typeof document !== 'undefined') {
 			document.body.classList.toggle('bureau', bureau);
+		}
+		if (import.meta.env.DEV) {
+			localStorage.setItem('dev-domain-mode', mode);
 		}
 	}
 </script>
